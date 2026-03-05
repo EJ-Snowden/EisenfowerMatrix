@@ -1,100 +1,143 @@
-<section class="card">
-  <h3 class="title">Eisenhower Matrix</h3>
+<section class="card card-pad">
+  <div class="card-head">
+    <h3 class="h3">Eisenhower Matrix</h3>
+    <div class="muted">{{ items.length }} tasks</div>
+  </div>
 
   <div class="grid">
-    <div class="cell">
-      <div class="cell-title">{{ titleOf('Q1') }}</div>
+    <div class="cell q1">
+      <div class="cell-title">
+        <span class="dot"></span>
+        <span>{{ titleOf('Q1') }}</span>
+        <span class="count">{{ q1.length }}</span>
+      </div>
+
       <div class="list" *ngIf="q1.length; else empty1">
         <div class="item" *ngFor="let x of q1; trackBy: trackById" [class.done]="x.task.isDone">
           <div class="row">
             <div class="name">{{ x.task.title }}</div>
             <div class="score">{{ x.score | number: '1.0-0' }}</div>
           </div>
+
           <div class="meta">
-            <span class="due" [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
+            <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
             <span class="pill">{{ x.task.effortMinutes }}m</span>
+            <span class="pill">{{ x.task.energy }}</span>
+            <span class="pill">{{ x.task.penalty }}</span>
           </div>
+
           <div class="actions">
-            <button type="button" class="btn small" (click)="onEdit(x.task.id)">Edit</button>
-            <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
+            <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+            <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
               {{ x.task.isDone ? 'Undone' : 'Done' }}
             </button>
-            <button type="button" class="btn small danger" (click)="onDelete(x.task.id)">Delete</button>
+            <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
           </div>
         </div>
       </div>
+
       <ng-template #empty1><div class="empty">Empty</div></ng-template>
     </div>
 
-    <div class="cell">
-      <div class="cell-title">{{ titleOf('Q2') }}</div>
+    <div class="cell q2">
+      <div class="cell-title">
+        <span class="dot"></span>
+        <span>{{ titleOf('Q2') }}</span>
+        <span class="count">{{ q2.length }}</span>
+      </div>
+
       <div class="list" *ngIf="q2.length; else empty2">
         <div class="item" *ngFor="let x of q2; trackBy: trackById" [class.done]="x.task.isDone">
           <div class="row">
             <div class="name">{{ x.task.title }}</div>
             <div class="score">{{ x.score | number: '1.0-0' }}</div>
           </div>
+
           <div class="meta">
-            <span class="due" [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
+            <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
             <span class="pill">{{ x.task.effortMinutes }}m</span>
+            <span class="pill">{{ x.task.energy }}</span>
+            <span class="pill">{{ x.task.penalty }}</span>
           </div>
+
           <div class="actions">
-            <button type="button" class="btn small" (click)="onEdit(x.task.id)">Edit</button>
-            <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
+            <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+            <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
               {{ x.task.isDone ? 'Undone' : 'Done' }}
             </button>
-            <button type="button" class="btn small danger" (click)="onDelete(x.task.id)">Delete</button>
+            <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
           </div>
         </div>
       </div>
+
       <ng-template #empty2><div class="empty">Empty</div></ng-template>
     </div>
 
-    <div class="cell">
-      <div class="cell-title">{{ titleOf('Q3') }}</div>
+    <div class="cell q3">
+      <div class="cell-title">
+        <span class="dot"></span>
+        <span>{{ titleOf('Q3') }}</span>
+        <span class="count">{{ q3.length }}</span>
+      </div>
+
       <div class="list" *ngIf="q3.length; else empty3">
         <div class="item" *ngFor="let x of q3; trackBy: trackById" [class.done]="x.task.isDone">
           <div class="row">
             <div class="name">{{ x.task.title }}</div>
             <div class="score">{{ x.score | number: '1.0-0' }}</div>
           </div>
+
           <div class="meta">
-            <span class="due" [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
+            <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
             <span class="pill">{{ x.task.effortMinutes }}m</span>
+            <span class="pill">{{ x.task.energy }}</span>
+            <span class="pill">{{ x.task.penalty }}</span>
           </div>
+
           <div class="actions">
-            <button type="button" class="btn small" (click)="onEdit(x.task.id)">Edit</button>
-            <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
+            <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+            <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
               {{ x.task.isDone ? 'Undone' : 'Done' }}
             </button>
-            <button type="button" class="btn small danger" (click)="onDelete(x.task.id)">Delete</button>
+            <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
           </div>
         </div>
       </div>
+
       <ng-template #empty3><div class="empty">Empty</div></ng-template>
     </div>
 
-    <div class="cell">
-      <div class="cell-title">{{ titleOf('Q4') }}</div>
+    <div class="cell q4">
+      <div class="cell-title">
+        <span class="dot"></span>
+        <span>{{ titleOf('Q4') }}</span>
+        <span class="count">{{ q4.length }}</span>
+      </div>
+
       <div class="list" *ngIf="q4.length; else empty4">
         <div class="item" *ngFor="let x of q4; trackBy: trackById" [class.done]="x.task.isDone">
           <div class="row">
             <div class="name">{{ x.task.title }}</div>
             <div class="score">{{ x.score | number: '1.0-0' }}</div>
           </div>
+
           <div class="meta">
-            <span class="due" [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
+            <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
             <span class="pill">{{ x.task.effortMinutes }}m</span>
+            <span class="pill">{{ x.task.energy }}</span>
+            <span class="pill">{{ x.task.penalty }}</span>
           </div>
+
           <div class="actions">
-            <button type="button" class="btn small" (click)="onEdit(x.task.id)">Edit</button>
-            <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
+            <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+            <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
               {{ x.task.isDone ? 'Undone' : 'Done' }}
             </button>
-            <button type="button" class="btn small danger" (click)="onDelete(x.task.id)">Delete</button>
+            <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
           </div>
         </div>
       </div>
+
       <ng-template #empty4><div class="empty">Empty</div></ng-template>
     </div>
   </div>

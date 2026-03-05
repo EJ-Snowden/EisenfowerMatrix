@@ -48,7 +48,6 @@ export class AuthPageComponent {
       } else {
         await this.auth.signIn(email, password);
       }
-
       await this.router.navigateByUrl('/tasks');
     } catch (e: any) {
       this.error = this.prettyError(e);

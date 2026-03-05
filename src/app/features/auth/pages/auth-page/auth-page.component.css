@@ -1,22 +1,37 @@
 .page {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  place-items: center;
+  padding: 10px 0 20px;
 }
 
-.h2 {
-  margin: 0;
+.hero {
+  text-align: center;
+  display: grid;
+  gap: 6px;
 }
 
-.card {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  padding: 12px;
-  max-width: 460px;
+.hero-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.78));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-sub {
+  font-size: 13px;
+}
+
+.auth-card {
+  width: min(520px, 100%);
 }
 
 .form {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .field {
@@ -24,39 +39,18 @@
   gap: 6px;
 }
 
-label {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-input {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 8px;
-  background: transparent;
-  color: inherit;
-}
-
 .actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-}
-
-.btn {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-.btn.primary {
-  border-color: rgba(255, 255, 255, 0.25);
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .error {
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 77, 109, 0.10);
+  border: 1px solid rgba(255, 77, 109, 0.22);
+  border-radius: 12px;
+  padding: 10px 12px;
   font-size: 13px;
-  opacity: 0.9;
 }

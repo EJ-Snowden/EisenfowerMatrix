@@ -1,94 +1,59 @@
-.card {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: var(--shadow);
+.plist {
+  display: grid;
+  gap: 12px;
 }
 
-.top {
+.pitem {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.pitem:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.pitem.done {
+  opacity: 0.62;
+}
+
+.topline {
   display: flex;
-  align-items: baseline;
+  align-items: start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.topline .left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topline .right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .title {
-  margin: 0;
-  font-size: 16px;
+  margin-top: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
 }
 
-.count {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.table-wrap {
-  overflow: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
+.notes {
+  margin-top: 6px;
   font-size: 13px;
 }
 
-.table th,
-.table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  text-align: left;
-  vertical-align: top;
-}
-
-.table thead th {
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.title-cell .main {
-  font-weight: 650;
-}
-
-.title-cell .sub {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.actions {
-  white-space: nowrap;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.btn.small {
-  padding: 6px 10px;
-  font-size: 12px;
-}
-
-.btn.danger {
-  border-color: rgba(255, 255, 255, 0.16);
-  opacity: 0.9;
-}
-
-.done {
-  opacity: 0.6;
-}
-
-.overdue {
-  font-weight: 700;
-}
-
-.empty {
-  color: var(--muted);
-  font-size: 13px;
+.meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }

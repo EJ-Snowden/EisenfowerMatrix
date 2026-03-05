@@ -1,21 +1,7 @@
-<div class="bar">
-  <button type="button" class="btn" [class.active]="isActive('today')" (click)="setFilter('today')">
-    Today
-  </button>
-
-  <button type="button" class="btn" [class.active]="isActive('tomorrow')" (click)="setFilter('tomorrow')">
-    Tomorrow
-  </button>
-
-  <button type="button" class="btn" [class.active]="isActive('week')" (click)="setFilter('week')">
-    Week
-  </button>
-
-  <button type="button" class="btn" [class.active]="isActive('all')" (click)="setFilter('all')">
-    All
-  </button>
-
-  <button type="button" class="btn" [class.active]="isActive('done')" (click)="setFilter('done')">
-    Done
-  </button>
+<div class="filters">
+  <button type="button" class="chip" [class.active]="isActive('today')" (click)="setFilter('today')">Today</button>
+  <button type="button" class="chip" [class.active]="isActive('tomorrow')" (click)="setFilter('tomorrow')">Tomorrow</button>
+  <button type="button" class="chip" [class.active]="isActive('week')" (click)="setFilter('week')">Week</button>
+  <button type="button" class="chip" [class.active]="isActive('all')" (click)="setFilter('all')">All</button>
+  <button type="button" class="chip" [class.active]="isActive('done')" (click)="setFilter('done')">Done</button>
 </div>

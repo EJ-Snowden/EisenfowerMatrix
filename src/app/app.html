@@ -1,18 +1,27 @@
 <header class="app-header">
-  <h1 class="app-title">
-    <a routerLink="/tasks" class="link">Eisenhower Matrix</a>
-  </h1>
+  <div class="container app-header-inner">
+    <div class="left">
+      <a class="brand" routerLink="/tasks">
+        <span class="brand-mark"></span>
+        <span class="brand-text">Eisenhower Matrix</span>
+      </a>
+      <div class="brand-sub">Urgency x Importance</div>
+    </div>
 
-  <div class="right" *ngIf="auth.user$ | async as u; else guest">
-    <div class="email">{{ u.email || 'user' }}</div>
-    <button class="btn" type="button" (click)="logout()">Logout</button>
+    <div class="right" *ngIf="auth.user$ | async as u; else guest">
+      <div class="user">
+        <span class="user-dot"></span>
+        <span class="user-email">{{ u.email || 'user' }}</span>
+      </div>
+      <button class="btn btn-ghost btn-xs" type="button" (click)="logout()">Logout</button>
+    </div>
+
+    <ng-template #guest>
+      <a routerLink="/auth" class="btn btn-primary btn-xs">Login</a>
+    </ng-template>
   </div>
-
-  <ng-template #guest>
-    <a routerLink="/auth" class="btn linkbtn">Login</a>
-  </ng-template>
 </header>
 
-<main class="app-main">
+<main class="container app-main">
   <router-outlet></router-outlet>
 </main>

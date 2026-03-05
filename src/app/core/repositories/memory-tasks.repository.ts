@@ -21,11 +21,11 @@ export class MemoryTasksRepository implements TasksRepository {
     );
   }
 
-  toggleDone(id: string): void {
+  setDone(id: string, isDone: boolean): void {
     const nowIso = new Date().toISOString();
     this.subject.next(
       this.subject.value.map((t) =>
-        t.id === id ? { ...t, isDone: !t.isDone, updatedAt: nowIso } : t
+        t.id === id ? { ...t, isDone, updatedAt: nowIso } : t
       )
     );
   }

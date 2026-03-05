@@ -1,0 +1,62 @@
+.page {
+  display: grid;
+  gap: 12px;
+}
+
+.h2 {
+  margin: 0;
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px;
+  max-width: 460px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+input {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px;
+  background: transparent;
+  color: inherit;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.btn.primary {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.error {
+  font-size: 13px;
+  opacity: 0.9;
+}

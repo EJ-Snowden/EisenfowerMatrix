@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { RankedTask } from '../../../models/task.model';
+import { RankedTask } from '../../../../models/task.model';
 
 @Component({
   selector: 'app-priority-list',

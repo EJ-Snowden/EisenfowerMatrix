@@ -6,6 +6,6 @@ export interface TasksRepository {
 
   add(task: TaskItem): void;
   update(id: string, patch: Partial<TaskItem>): void;
-  toggleDone(id: string): void;
+  setDone(id: string, isDone: boolean): void;
   delete(id: string): void;
 }

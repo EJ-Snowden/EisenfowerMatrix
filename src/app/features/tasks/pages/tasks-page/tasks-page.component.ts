@@ -65,7 +65,11 @@ export class TasksPageComponent {
   }
 
   onToggleDone(id: string): void {
-    this.repo.toggleDone(id);
+    const sub = this.repo.tasks$.subscribe((tasks) => {
+      const t = tasks.find((x) => x.id === id);
+      if (t) this.repo.setDone(id, !t.isDone);
+      sub.unsubscribe();
+    });
   }
 
   onDeleteTask(id: string): void {

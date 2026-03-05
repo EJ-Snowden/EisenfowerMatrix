@@ -1,5 +1,16 @@
 <header class="app-header">
-  <h1 class="app-title">Eisenhower Matrix</h1>
+  <h1 class="app-title">
+    <a routerLink="/tasks" class="link">Eisenhower Matrix</a>
+  </h1>
+
+  <div class="right" *ngIf="auth.user$ | async as u; else guest">
+    <div class="email">{{ u.email || 'user' }}</div>
+    <button class="btn" type="button" (click)="logout()">Logout</button>
+  </div>
+
+  <ng-template #guest>
+    <a routerLink="/auth" class="btn linkbtn">Login</a>
+  </ng-template>
 </header>
 
 <main class="app-main">

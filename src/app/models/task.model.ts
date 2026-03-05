@@ -11,16 +11,12 @@ export interface TaskItem {
   title: string;
   notes?: string;
 
-  // Date only in format YYYY-MM-DD
   dueDate: string;
 
-  // 0..100
   importance: number;
 
-  // 0..100 (feeling)
   urgencyFeeling: number;
 
-  // one of: 5,15,30,60,120,240,480
   effortMinutes: number;
 
   energy: EnergyLevel;
@@ -31,17 +27,15 @@ export interface TaskItem {
 
   isDone: boolean;
 
-  // ISO datetime strings
   createdAt: string;
   updatedAt: string;
 }
 
 export interface RankedTask {
   task: TaskItem;
-  score: number; // 0..100
+  score: number;
   quadrant: Quadrant;
 
-  // debug values (полезно видеть в UI)
   impact: number;
   deadline: number;
   aging: number;

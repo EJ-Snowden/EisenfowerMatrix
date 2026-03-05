@@ -3,12 +3,9 @@ import { Quadrant, RankedTask, TaskItem } from '../../../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class PriorityService {
-  // thresholds
   private readonly importantThreshold = 0.5;
-  private readonly urgentDeadlineThreshold = 0.5;
-  private readonly urgentFeelingThreshold = 0.6;
+  private readonly urgentThreshold = 0.5;
 
-  // weights (можно будет вынести в settings)
   private readonly wImpact = 0.35;
   private readonly wDeadline = 0.25;
   private readonly wFeeling = 0.10;
@@ -26,8 +23,8 @@ export class PriorityService {
   }
 
   rankOne(task: TaskItem, now: Date = new Date()): RankedTask {
-    const impact = this.clamp01(task.importance / 100);
-    const uFeeling = this.clamp01(task.urgencyFeeling / 100);
+    const impact = this.clamp01(Number(task.importance) / 100);
+    const uFeeling = this.clamp01(Number(task.urgencyFeeling) / 100);
 
     const daysUntilDue = this.daysUntilDue(task.dueDate, now);
     const ageDays = this.ageDays(task.createdAt, now);
@@ -56,7 +53,7 @@ export class PriorityService {
 
     const score = this.clamp(100 * raw, 0, 100);
 
-    const quadrant = this.getQuadrant(impact, deadline, uFeeling);
+    const quadrant = this.getQuadrant(impact, uFeeling);
 
     return {
       task,
@@ -68,9 +65,9 @@ export class PriorityService {
     };
   }
 
-  getQuadrant(impact: number, deadline: number, uFeeling: number): Quadrant {
+  getQuadrant(impact: number, uFeeling: number): Quadrant {
     const isImportant = impact >= this.importantThreshold;
-    const isUrgent = deadline >= this.urgentDeadlineThreshold || uFeeling >= this.urgentFeelingThreshold;
+    const isUrgent = uFeeling >= this.urgentThreshold;
 
     if (isUrgent && isImportant) return 'Q1';
     if (!isUrgent && isImportant) return 'Q2';
@@ -79,35 +76,16 @@ export class PriorityService {
   }
 
   private compareRanked(a: RankedTask, b: RankedTask): number {
-    const qo = (q: Quadrant) => {
-      switch (q) {
-        case 'Q1':
-          return 1;
-        case 'Q2':
-          return 2;
-        case 'Q3':
-          return 3;
-        case 'Q4':
-          return 4;
-      }
-    };
-
-    const qDiff = qo(a.quadrant) - qo(b.quadrant);
-    if (qDiff !== 0) return qDiff;
-
     const scoreDiff = b.score - a.score;
     if (Math.abs(scoreDiff) > 0.0001) return scoreDiff;
 
-    // dueDate asc
     const dueDiff = a.task.dueDate.localeCompare(b.task.dueDate);
     if (dueDiff !== 0) return dueDiff;
 
-    // updatedAt desc
     return b.task.updatedAt.localeCompare(a.task.updatedAt);
   }
 
   private deadlinePressure(daysUntilDue: number): number {
-    // logistic: 1 / (1 + exp((daysUntilDue - 2) / 1.2))
     if (daysUntilDue < 0) return 1.2;
 
     const x = (daysUntilDue - 2) / 1.2;
@@ -116,14 +94,13 @@ export class PriorityService {
   }
 
   private agingBoost(ageDays: number): number {
-    // min(1, log(1+ageDays)/log(1+14))
     const denom = Math.log(1 + 14);
     const v = denom === 0 ? 0 : Math.log(1 + Math.max(0, ageDays)) / denom;
     return this.clamp01(v);
   }
 
   private effortCost(effortMinutes: number): number {
-    const hours = Math.max(0, effortMinutes) / 60;
+    const hours = Math.max(0, Number(effortMinutes)) / 60;
     const ratio = Math.min(1, hours / 8);
     return this.clamp01(Math.sqrt(ratio));
   }
@@ -177,7 +154,6 @@ export class PriorityService {
   }
 
   private parseDateOnly(s: string): Date {
-    // s: YYYY-MM-DD
     const [y, m, d] = s.split('-').map((x) => Number(x));
     return new Date(y, (m || 1) - 1, d || 1);
   }

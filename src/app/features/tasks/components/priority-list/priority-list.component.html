@@ -12,8 +12,6 @@
         <th>Score</th>
         <th>Title</th>
         <th>Due</th>
-        <th>I</th>
-        <th>U</th>
         <th>Effort</th>
         <th class="actions">Actions</th>
       </tr>
@@ -28,10 +26,9 @@
           <div class="sub" *ngIf="x.task.notes">{{ x.task.notes }}</div>
         </td>
         <td [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</td>
-        <td>{{ x.task.importance }}</td>
-        <td>{{ x.task.urgencyFeeling }}</td>
         <td>{{ x.task.effortMinutes }}m</td>
         <td class="actions">
+          <button type="button" class="btn small" (click)="onEdit(x.task.id)">Edit</button>
           <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
             {{ x.task.isDone ? 'Undone' : 'Done' }}
           </button>

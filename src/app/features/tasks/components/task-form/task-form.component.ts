@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
 import {ReactiveFormsModule, Validators, FormBuilder, FormsModule} from '@angular/forms';
 import {
   Category,
   CommitmentLevel,
   EnergyLevel,
   PenaltyLevel,
+  TaskItem,
 } from '../../../../models/task.model';
 
 export interface CreateTaskPayload {
@@ -21,6 +22,11 @@ export interface CreateTaskPayload {
   category?: Category;
 }
 
+export interface UpdateTaskPayload {
+  id: string;
+  patch: Partial<TaskItem>;
+}
+
 @Component({
   selector: 'app-task-form',
   standalone: true,
@@ -28,8 +34,12 @@ export interface CreateTaskPayload {
   templateUrl: './task-form.component.html',
   styleUrl: './task-form.component.css',
 })
-export class TaskFormComponent {
+export class TaskFormComponent implements OnChanges {
+  @Input() editTask: TaskItem | null = null;
+
   @Output() createTask = new EventEmitter<CreateTaskPayload>();
+  @Output() updateTask = new EventEmitter<UpdateTaskPayload>();
+  @Output() cancelEdit = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
 
@@ -80,6 +90,28 @@ export class TaskFormComponent {
     notes: this.fb.control(''),
   });
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['editTask']) {
+      const t = this.editTask;
+      if (!t) return;
+
+      this.isAdvanced = true;
+
+      this.form.reset({
+        title: t.title ?? '',
+        dueDate: t.dueDate ?? this.todayDateOnly(),
+        importance: t.importance ?? 50,
+        urgencyFeeling: t.urgencyFeeling ?? 50,
+        effortMinutes: t.effortMinutes ?? 30,
+        energy: t.energy ?? 'medium',
+        commitment: t.commitment ?? 'none',
+        penalty: t.penalty ?? 'medium',
+        category: (t.category ?? '') as any,
+        notes: t.notes ?? '',
+      });
+    }
+  }
+
   toggleAdvanced(): void {
     this.isAdvanced = !this.isAdvanced;
   }
@@ -106,7 +138,7 @@ export class TaskFormComponent {
 
     const v = this.form.getRawValue();
 
-    const payload: CreateTaskPayload = {
+    const common: CreateTaskPayload = {
       title: (v.title ?? '').trim(),
       dueDate: v.dueDate!,
       importance: Number(v.importance ?? 0),
@@ -119,7 +151,26 @@ export class TaskFormComponent {
       category: v.category ? (v.category as Category) : undefined,
     };
 
-    this.createTask.emit(payload);
+    if (this.editTask) {
+      this.updateTask.emit({
+        id: this.editTask.id,
+        patch: {
+          title: common.title,
+          dueDate: common.dueDate,
+          importance: common.importance,
+          urgencyFeeling: common.urgencyFeeling,
+          effortMinutes: common.effortMinutes,
+          energy: common.energy,
+          commitment: common.commitment,
+          penalty: common.penalty,
+          category: common.category,
+          notes: common.notes,
+        },
+      });
+      return;
+    }
+
+    this.createTask.emit(common);
 
     this.form.reset({
       title: '',
@@ -136,6 +187,11 @@ export class TaskFormComponent {
   }
 
   clear(): void {
+    if (this.editTask) {
+      this.cancelEdit.emit();
+      return;
+    }
+
     this.form.reset({
       title: '',
       dueDate: this.todayDateOnly(),

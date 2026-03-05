@@ -14,6 +14,7 @@ export class MatrixComponent implements OnChanges {
 
   @Output() toggleDone = new EventEmitter<string>();
   @Output() deleteTask = new EventEmitter<string>();
+  @Output() editTask = new EventEmitter<string>();
 
   q1: RankedTask[] = [];
   q2: RankedTask[] = [];
@@ -21,9 +22,7 @@ export class MatrixComponent implements OnChanges {
   q4: RankedTask[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['items']) {
-      this.rebuild();
-    }
+    if (changes['items']) this.rebuild();
   }
 
   private rebuild(): void {
@@ -52,6 +51,10 @@ export class MatrixComponent implements OnChanges {
 
   onDelete(id: string): void {
     this.deleteTask.emit(id);
+  }
+
+  onEdit(id: string): void {
+    this.editTask.emit(id);
   }
 
   trackById(_: number, x: RankedTask): string {

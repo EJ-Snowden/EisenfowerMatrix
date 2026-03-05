@@ -14,6 +14,7 @@ export class PriorityListComponent {
 
   @Output() toggleDone = new EventEmitter<string>();
   @Output() deleteTask = new EventEmitter<string>();
+  @Output() editTask = new EventEmitter<string>();
 
   onToggleDone(id: string): void {
     this.toggleDone.emit(id);
@@ -21,5 +22,9 @@ export class PriorityListComponent {
 
   onDelete(id: string): void {
     this.deleteTask.emit(id);
+  }
+
+  onEdit(id: string): void {
+    this.editTask.emit(id);
   }
 }

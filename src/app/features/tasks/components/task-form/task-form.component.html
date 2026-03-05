@@ -1,6 +1,6 @@
 <section class="card">
   <div class="top">
-    <h3 class="title">Add task</h3>
+    <h3 class="title">{{ editTask ? 'Edit task' : 'Add task' }}</h3>
 
     <button type="button" class="link" (click)="toggleAdvanced()">
       {{ isAdvanced ? 'Simple' : 'Advanced' }}
@@ -31,34 +31,14 @@
 
     <div class="field">
       <label>Importance: {{ form.controls.importance.value }}</label>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        [formControl]="form.controls.importance"
-      />
-      <input
-        type="number"
-        min="0"
-        max="100"
-        [formControl]="form.controls.importance"
-      />
+      <input type="range" min="0" max="100" [formControl]="form.controls.importance" />
+      <input type="number" min="0" max="100" [formControl]="form.controls.importance" />
     </div>
 
     <div class="field">
       <label>Urgency feeling: {{ form.controls.urgencyFeeling.value }}</label>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        [formControl]="form.controls.urgencyFeeling"
-      />
-      <input
-        type="number"
-        min="0"
-        max="100"
-        [formControl]="form.controls.urgencyFeeling"
-      />
+      <input type="range" min="0" max="100" [formControl]="form.controls.urgencyFeeling" />
+      <input type="number" min="0" max="100" [formControl]="form.controls.urgencyFeeling" />
     </div>
 
     <div class="field col-2">
@@ -122,9 +102,12 @@
 
     <div class="actions col-2">
       <button type="submit" class="btn primary" [disabled]="form.invalid">
-        Add
+        {{ editTask ? 'Save' : 'Add' }}
       </button>
-      <button type="button" class="btn" (click)="clear()">Clear</button>
+
+      <button type="button" class="btn" (click)="clear()">
+        {{ editTask ? 'Cancel' : 'Clear' }}
+      </button>
     </div>
   </form>
 </section>

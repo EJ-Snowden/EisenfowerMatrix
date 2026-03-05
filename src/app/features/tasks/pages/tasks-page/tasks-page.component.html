@@ -11,6 +11,7 @@
       <app-matrix
         class="left"
         [items]="ranked"
+        (editTask)="startEdit($event)"
         (toggleDone)="onToggleDone($event)"
         (deleteTask)="onDeleteTask($event)"
       ></app-matrix>
@@ -18,9 +19,22 @@
       <app-priority-list
         class="right"
         [items]="ranked"
+        (editTask)="startEdit($event)"
         (toggleDone)="onToggleDone($event)"
         (deleteTask)="onDeleteTask($event)"
       ></app-priority-list>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="editingTask$ | async as t">
+    <div class="modal-backdrop" *ngIf="t" (click)="closeEdit()"></div>
+
+    <div class="modal" *ngIf="t">
+      <app-task-form
+        [editTask]="t"
+        (updateTask)="onUpdateTask($event)"
+        (cancelEdit)="closeEdit()"
+      ></app-task-form>
     </div>
   </ng-container>
 </section>

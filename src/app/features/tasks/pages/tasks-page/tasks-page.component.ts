@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, shareReplay, take } from 'rxjs';
 
 import { RankedTask, TaskItem } from '../../../../models/task.model';
 import { PriorityService } from '../../services/priority.service';
@@ -8,7 +8,7 @@ import { PriorityService } from '../../services/priority.service';
 import { TASKS_REPOSITORY } from '../../../../core/repositories/tasks-repository.token';
 import { TasksRepository } from '../../../../core/repositories/tasks-repository';
 
-import { TaskFormComponent, CreateTaskPayload } from '../../components/task-form/task-form.component';
+import { TaskFormComponent, CreateTaskPayload, UpdateTaskPayload } from '../../components/task-form/task-form.component';
 import { FiltersComponent } from '../../components/filters/filters.component';
 import { MatrixComponent } from '../../components/matrix/matrix.component';
 import { PriorityListComponent } from '../../components/priority-list/priority-list.component';
@@ -29,11 +29,16 @@ export class TasksPageComponent {
   activeFilter: TaskFilter = 'today';
   private readonly activeFilter$ = new BehaviorSubject<TaskFilter>(this.activeFilter);
 
-  ranked$ = combineLatest([this.repo.tasks$, this.activeFilter$]).pipe(
-    map(([tasks, filter]) => {
-      const filtered = this.applyFilter(tasks, filter);
-      return this.priority.toRanked(filtered);
-    })
+  private readonly editingId$ = new BehaviorSubject<string | null>(null);
+
+  readonly tasks$ = this.repo.tasks$.pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  readonly ranked$ = combineLatest([this.tasks$, this.activeFilter$]).pipe(
+    map(([tasks, filter]) => this.priority.toRanked(this.applyFilter(tasks, filter)))
+  );
+
+  readonly editingTask$ = combineLatest([this.tasks$, this.editingId$]).pipe(
+    map(([tasks, id]) => (id ? tasks.find((t) => t.id === id) ?? null : null))
   );
 
   onCreateTask(payload: CreateTaskPayload): void {
@@ -59,21 +64,34 @@ export class TasksPageComponent {
     this.repo.add(task);
   }
 
+  onUpdateTask(p: UpdateTaskPayload): void {
+    this.repo.update(p.id, p.patch);
+    this.closeEdit();
+  }
+
   onFilterChange(f: TaskFilter): void {
     this.activeFilter = f;
     this.activeFilter$.next(f);
   }
 
   onToggleDone(id: string): void {
-    const sub = this.repo.tasks$.subscribe((tasks) => {
+    this.tasks$.pipe(take(1)).subscribe((tasks) => {
       const t = tasks.find((x) => x.id === id);
       if (t) this.repo.setDone(id, !t.isDone);
-      sub.unsubscribe();
     });
   }
 
   onDeleteTask(id: string): void {
     this.repo.delete(id);
+    if (this.editingId$.value === id) this.closeEdit();
+  }
+
+  startEdit(id: string): void {
+    this.editingId$.next(id);
+  }
+
+  closeEdit(): void {
+    this.editingId$.next(null);
   }
 
   private applyFilter(all: TaskItem[], filter: TaskFilter): TaskItem[] {

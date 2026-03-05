@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
-import {ReactiveFormsModule, Validators, FormBuilder, FormsModule} from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import {
   Category,
   CommitmentLevel,
@@ -26,6 +26,8 @@ export interface UpdateTaskPayload {
   id: string;
   patch: Partial<TaskItem>;
 }
+
+type IntControlName = 'importance' | 'urgencyFeeling';
 
 @Component({
   selector: 'app-task-form',
@@ -128,6 +130,24 @@ export class TaskFormComponent implements OnChanges {
 
   setEffort(minutes: number): void {
     this.form.controls.effortMinutes.setValue(minutes);
+  }
+
+  // Главный фикс: синхронизация range <-> number и ограничение 0..100 + округление до int
+  syncInt(controlName: IntControlName, event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const raw = el.value;
+
+    if (raw === '' || raw == null) return;
+
+    const num = Math.round(Number(raw));
+    const clamped = this.clampInt(Number.isFinite(num) ? num : 0, 0, 100);
+
+    this.form.controls[controlName].setValue(clamped);
+    el.value = String(clamped);
+  }
+
+  private clampInt(v: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, v));
   }
 
   submit(): void {

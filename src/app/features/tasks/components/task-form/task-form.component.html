@@ -25,14 +25,46 @@
 
     <div class="field">
       <label>Importance: {{ form.controls.importance.value }}</label>
-      <input type="range" min="0" max="100" formControlName="importance" />
-      <input type="number" min="0" max="100" step="1" formControlName="importance" />
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        [value]="form.controls.importance.value ?? 0"
+        (input)="syncInt('importance', $event)"
+      />
+
+      <input
+        type="number"
+        min="0"
+        max="100"
+        step="1"
+        [value]="form.controls.importance.value ?? 0"
+        (input)="syncInt('importance', $event)"
+      />
     </div>
 
     <div class="field">
       <label>Urgency feeling: {{ form.controls.urgencyFeeling.value }}</label>
-      <input type="range" min="0" max="100" formControlName="urgencyFeeling" />
-      <input type="number" min="0" max="100" step="1" formControlName="urgencyFeeling" />
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        [value]="form.controls.urgencyFeeling.value ?? 0"
+        (input)="syncInt('urgencyFeeling', $event)"
+      />
+
+      <input
+        type="number"
+        min="0"
+        max="100"
+        step="1"
+        [value]="form.controls.urgencyFeeling.value ?? 0"
+        (input)="syncInt('urgencyFeeling', $event)"
+      />
     </div>
 
     <div class="field col-2">

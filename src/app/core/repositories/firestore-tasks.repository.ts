@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, filter, firstValueFrom } from 'rxjs';
 import { TaskItem } from '../../models/task.model';
 import { TasksRepository } from './tasks-repository';
 import { AuthService } from '../auth/auth.service';
@@ -19,26 +19,28 @@ export class FirestoreTasksRepository implements TasksRepository {
   private readonly firestore = inject(Firestore);
   private readonly auth = inject(AuthService);
 
-  private readonly lastValue = new BehaviorSubject<TaskItem[]>([]);
   readonly tasks$: Observable<TaskItem[]> = this.auth.user$.pipe(
     switchMap((u) => {
       if (!u) return of([]);
       const col = collection(this.firestore, `users/${u.uid}/tasks`);
-      return (collectionData(col, { idField: 'id' }) as Observable<TaskItem[]>);
+      return collectionData(col, { idField: 'id' }) as Observable<TaskItem[]>;
     })
   );
 
   add(task: TaskItem): void {
     void this.runWithUid(async (uid) => {
       const ref = doc(this.firestore, `users/${uid}/tasks/${task.id}`);
-      await setDoc(ref, task, { merge: false });
+      const clean = this.stripUndefined(task);
+      await setDoc(ref, clean, { merge: false });
     });
   }
 
   update(id: string, patch: Partial<TaskItem>): void {
     void this.runWithUid(async (uid) => {
       const ref = doc(this.firestore, `users/${uid}/tasks/${id}`);
-      await updateDoc(ref, { ...patch, updatedAt: new Date().toISOString() } as any);
+      const nowIso = new Date().toISOString();
+      const clean = this.stripUndefined({ ...patch, updatedAt: nowIso } as any);
+      await updateDoc(ref, clean as any);
     });
   }
 
@@ -58,19 +60,18 @@ export class FirestoreTasksRepository implements TasksRepository {
   }
 
   private async runWithUid(fn: (uid: string) => Promise<void>): Promise<void> {
-    const u = await new Promise<any>((resolve) => {
-      const sub = this.auth.user$.subscribe((x) => {
-        resolve(x);
-        sub.unsubscribe();
-      });
-    });
-
-    if (!u?.uid) return;
+    const u = await firstValueFrom(this.auth.user$.pipe(filter((x) => !!x)));
+    const uid = (u as any)?.uid as string | undefined;
+    if (!uid) return;
 
     try {
-      await fn(u.uid);
+      await fn(uid);
     } catch (e) {
       console.error(e);
     }
+  }
+
+  private stripUndefined<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj)) as T;
   }
 }

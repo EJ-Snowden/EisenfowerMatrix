@@ -7,22 +7,16 @@
     </button>
   </div>
 
-  <form class="grid" (ngSubmit)="submit()">
+  <form class="grid" [formGroup]="form" (ngSubmit)="submit()">
     <div class="field col-2">
       <label>Title</label>
-      <input
-        type="text"
-        [formControl]="form.controls.title"
-        placeholder="What to do?"
-      />
-      <div class="error" *ngIf="titleInvalid">
-        Title is required (min 2 chars)
-      </div>
+      <input type="text" formControlName="title" placeholder="What to do?" />
+      <div class="error" *ngIf="titleInvalid">Title is required (min 2 chars)</div>
     </div>
 
     <div class="field">
       <label>Due date</label>
-      <input type="date" [formControl]="form.controls.dueDate" />
+      <input type="date" formControlName="dueDate" />
       <div class="row">
         <button type="button" class="btn small" (click)="setToday()">Today</button>
         <button type="button" class="btn small" (click)="setTomorrow()">Tomorrow</button>
@@ -31,14 +25,14 @@
 
     <div class="field">
       <label>Importance: {{ form.controls.importance.value }}</label>
-      <input type="range" min="0" max="100" [formControl]="form.controls.importance" />
-      <input type="number" min="0" max="100" [formControl]="form.controls.importance" />
+      <input type="range" min="0" max="100" formControlName="importance" />
+      <input type="number" min="0" max="100" step="1" formControlName="importance" />
     </div>
 
     <div class="field">
       <label>Urgency feeling: {{ form.controls.urgencyFeeling.value }}</label>
-      <input type="range" min="0" max="100" [formControl]="form.controls.urgencyFeeling" />
-      <input type="number" min="0" max="100" [formControl]="form.controls.urgencyFeeling" />
+      <input type="range" min="0" max="100" formControlName="urgencyFeeling" />
+      <input type="number" min="0" max="100" step="1" formControlName="urgencyFeeling" />
     </div>
 
     <div class="field col-2">
@@ -59,44 +53,36 @@
     <ng-container *ngIf="isAdvanced">
       <div class="field">
         <label>Energy</label>
-        <select [formControl]="form.controls.energy">
-          <option *ngFor="let x of energyOptions" [value]="x.value">
-            {{ x.label }}
-          </option>
+        <select formControlName="energy">
+          <option *ngFor="let x of energyOptions" [value]="x.value">{{ x.label }}</option>
         </select>
       </div>
 
       <div class="field">
         <label>Commitment</label>
-        <select [formControl]="form.controls.commitment">
-          <option *ngFor="let x of commitmentOptions" [value]="x.value">
-            {{ x.label }}
-          </option>
+        <select formControlName="commitment">
+          <option *ngFor="let x of commitmentOptions" [value]="x.value">{{ x.label }}</option>
         </select>
       </div>
 
       <div class="field">
         <label>Penalty</label>
-        <select [formControl]="form.controls.penalty">
-          <option *ngFor="let x of penaltyOptions" [value]="x.value">
-            {{ x.label }}
-          </option>
+        <select formControlName="penalty">
+          <option *ngFor="let x of penaltyOptions" [value]="x.value">{{ x.label }}</option>
         </select>
       </div>
 
       <div class="field">
         <label>Category</label>
-        <select [formControl]="form.controls.category">
+        <select formControlName="category">
           <option value="">None</option>
-          <option *ngFor="let x of categoryOptions" [value]="x.value">
-            {{ x.label }}
-          </option>
+          <option *ngFor="let x of categoryOptions" [value]="x.value">{{ x.label }}</option>
         </select>
       </div>
 
       <div class="field col-2">
         <label>Notes</label>
-        <textarea rows="3" [formControl]="form.controls.notes"></textarea>
+        <textarea rows="3" formControlName="notes"></textarea>
       </div>
     </ng-container>
 

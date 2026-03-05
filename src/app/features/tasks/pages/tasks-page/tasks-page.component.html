@@ -1,0 +1,26 @@
+<section class="page">
+  <div class="head">
+    <h2 class="h2">Tasks</h2>
+    <app-filters [active]="activeFilter" (filterChange)="onFilterChange($event)"></app-filters>
+  </div>
+
+  <app-task-form (createTask)="onCreateTask($event)"></app-task-form>
+
+  <ng-container *ngIf="ranked$ | async as ranked">
+    <div class="layout">
+      <app-matrix
+        class="left"
+        [items]="ranked"
+        (toggleDone)="onToggleDone($event)"
+        (deleteTask)="onDeleteTask($event)"
+      ></app-matrix>
+
+      <app-priority-list
+        class="right"
+        [items]="ranked"
+        (toggleDone)="onToggleDone($event)"
+        (deleteTask)="onDeleteTask($event)"
+      ></app-priority-list>
+    </div>
+  </ng-container>
+</section>

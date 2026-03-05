@@ -1,0 +1,92 @@
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.count {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table thead th {
+  opacity: 0.85;
+}
+
+.title-cell .main {
+  font-weight: 600;
+}
+
+.title-cell .sub {
+  opacity: 0.75;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.btn.small {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.btn.danger {
+  border-color: rgba(255, 255, 255, 0.18);
+  opacity: 0.85;
+}
+
+.done {
+  opacity: 0.6;
+}
+
+.overdue {
+  opacity: 1;
+  font-weight: 700;
+}
+
+.empty {
+  opacity: 0.75;
+  font-size: 13px;
+}

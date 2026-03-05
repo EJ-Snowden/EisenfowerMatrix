@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.app-header {
+  margin-bottom: 16px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.app-main {
+  max-width: 980px;
+}

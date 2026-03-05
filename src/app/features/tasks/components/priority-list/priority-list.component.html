@@ -1,0 +1,50 @@
+<section class="card">
+  <div class="top">
+    <h3 class="title">Priority list</h3>
+    <div class="count">{{ items.length }} items</div>
+  </div>
+
+  <div class="table-wrap" *ngIf="items.length > 0; else empty">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Q</th>
+        <th>Score</th>
+        <th>Title</th>
+        <th>Due</th>
+        <th>I</th>
+        <th>U</th>
+        <th>Effort</th>
+        <th class="actions">Actions</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let x of items" [class.done]="x.task.isDone">
+        <td>{{ x.quadrant }}</td>
+        <td>{{ x.score | number: '1.0-1' }}</td>
+        <td class="title-cell">
+          <div class="main">{{ x.task.title }}</div>
+          <div class="sub" *ngIf="x.task.notes">{{ x.task.notes }}</div>
+        </td>
+        <td [class.overdue]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</td>
+        <td>{{ x.task.importance }}</td>
+        <td>{{ x.task.urgencyFeeling }}</td>
+        <td>{{ x.task.effortMinutes }}m</td>
+        <td class="actions">
+          <button type="button" class="btn small" (click)="onToggleDone(x.task.id)">
+            {{ x.task.isDone ? 'Undone' : 'Done' }}
+          </button>
+          <button type="button" class="btn small danger" (click)="onDelete(x.task.id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="empty">No tasks for this filter.</div>
+  </ng-template>
+</section>

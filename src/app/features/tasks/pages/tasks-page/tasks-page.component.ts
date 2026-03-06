@@ -14,11 +14,12 @@ import { MatrixComponent } from '../../components/matrix/matrix.component';
 import { PriorityListComponent } from '../../components/priority-list/priority-list.component';
 
 import { TaskFilter } from '../../models/task-filter.model';
+import { TPipe } from '../../../../core/i18n/t.pipe';
 
 @Component({
   selector: 'app-tasks-page',
   standalone: true,
-  imports: [CommonModule, TaskFormComponent, FiltersComponent, MatrixComponent, PriorityListComponent],
+  imports: [CommonModule, TaskFormComponent, FiltersComponent, MatrixComponent, PriorityListComponent, TPipe],
   templateUrl: './tasks-page.component.html',
   styleUrl: './tasks-page.component.css',
 })

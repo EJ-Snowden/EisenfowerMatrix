@@ -3,22 +3,56 @@
     <div class="left">
       <a class="brand" routerLink="/tasks">
         <span class="brand-mark"></span>
-        <span class="brand-text">Eisenhower Matrix</span>
+        <span class="brand-text">{{ 'app.title' | t }}</span>
       </a>
-      <div class="brand-sub">Urgency x Importance</div>
+      <div class="brand-sub">{{ 'app.subtitle' | t }}</div>
     </div>
 
-    <div class="right" *ngIf="auth.user$ | async as u; else guest">
-      <div class="user">
+    <div class="right">
+      <div class="lang" title="{{ 'lang.title' | t }}">
+        <span class="lang-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm7.7 9h-3.06a15.7 15.7 0 0 0-1.2-5 8.02 8.02 0 0 1 4.26 5ZM12 4c.9 0 2.24 2.02 3.03 7H8.97C9.76 6.02 11.1 4 12 4ZM4.04 13H7.1c.2 1.92.7 3.78 1.46 5.34A8.02 8.02 0 0 1 4.04 13Zm3.06-2H4.04a8.02 8.02 0 0 1 4.52-5.34A15.9 15.9 0 0 0 7.1 11Zm1.87 0h6.06c.1 1.25.1 2.75 0 4H8.97a16.2 16.2 0 0 1 0-4Zm.23 6h5.6c-.78 4.98-2.12 7-2.8 7s-2.02-2.02-2.8-7Zm6.24 1.34c.76-1.56 1.26-3.42 1.46-5.34h3.06a8.02 8.02 0 0 1-4.52 5.34ZM16.9 11h-3.06c-.2-1.92-.7-3.78-1.46-5.34A8.02 8.02 0 0 1 16.9 11Zm-3.87 6h-2.06c.2 1.92.7 3.78 1.46 5.34A8.02 8.02 0 0 0 16.9 17h-3.87Z"/>
+          </svg>
+        </span>
+
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="i18n.lang === 'en'"
+          (click)="setLang('en')"
+        >
+          {{ 'lang.en' | t }}
+        </button>
+
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="i18n.lang === 'ru'"
+          (click)="setLang('ru')"
+        >
+          {{ 'lang.ru' | t }}
+        </button>
+      </div>
+
+      <div class="user" *ngIf="auth.user$ | async as u; else guest">
         <span class="user-dot"></span>
         <span class="user-email">{{ u.email || 'user' }}</span>
       </div>
-      <button class="btn btn-ghost btn-xs" type="button" (click)="logout()">Logout</button>
-    </div>
 
-    <ng-template #guest>
-      <a routerLink="/auth" class="btn btn-primary btn-xs">Login</a>
-    </ng-template>
+      <button
+        *ngIf="auth.user$ | async"
+        class="btn btn-ghost btn-xs"
+        type="button"
+        (click)="logout()"
+      >
+        {{ 'app.logout' | t }}
+      </button>
+
+      <ng-template #guest>
+        <a routerLink="/auth" class="btn btn-primary btn-xs">{{ 'app.login' | t }}</a>
+      </ng-template>
+    </div>
   </div>
 </header>
 

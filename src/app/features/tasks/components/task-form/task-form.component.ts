@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
+
 import {
   Category,
   CommitmentLevel,
@@ -8,6 +9,8 @@ import {
   PenaltyLevel,
   TaskItem,
 } from '../../../../models/task.model';
+
+import { TPipe } from '../../../../core/i18n/t.pipe';
 
 export interface CreateTaskPayload {
   title: string;
@@ -32,7 +35,7 @@ type IntControlName = 'importance' | 'urgencyFeeling';
 @Component({
   selector: 'app-task-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TPipe],
   templateUrl: './task-form.component.html',
   styleUrl: './task-form.component.css',
 })
@@ -49,31 +52,10 @@ export class TaskFormComponent implements OnChanges {
 
   readonly effortOptions = [5, 15, 30, 60, 120, 240, 480];
 
-  readonly energyOptions: { value: EnergyLevel; label: string }[] = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-  ];
-
-  readonly commitmentOptions: { value: CommitmentLevel; label: string }[] = [
-    { value: 'none', label: 'None' },
-    { value: 'soft', label: 'Soft' },
-    { value: 'hard', label: 'Hard' },
-  ];
-
-  readonly penaltyOptions: { value: PenaltyLevel; label: string }[] = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-  ];
-
-  readonly categoryOptions: { value: Category; label: string }[] = [
-    { value: 'work', label: 'Work' },
-    { value: 'home', label: 'Home' },
-    { value: 'health', label: 'Health' },
-    { value: 'people', label: 'People' },
-    { value: 'self', label: 'Self' },
-  ];
+  readonly energyOptions: EnergyLevel[] = ['low', 'medium', 'high'];
+  readonly commitmentOptions: CommitmentLevel[] = ['none', 'soft', 'hard'];
+  readonly penaltyOptions: PenaltyLevel[] = ['low', 'medium', 'high'];
+  readonly categoryOptions: Category[] = ['work', 'home', 'health', 'people', 'self'];
 
   form = this.fb.group({
     title: this.fb.control('', [Validators.required, Validators.minLength(2)]),
@@ -132,7 +114,6 @@ export class TaskFormComponent implements OnChanges {
     this.form.controls.effortMinutes.setValue(minutes);
   }
 
-  // Главный фикс: синхронизация range <-> number и ограничение 0..100 + округление до int
   syncInt(controlName: IntControlName, event: Event): void {
     const el = event.target as HTMLInputElement;
     const raw = el.value;

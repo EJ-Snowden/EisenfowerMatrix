@@ -1,7 +1,17 @@
 <div class="filters">
-  <button type="button" class="chip" [class.active]="isActive('today')" (click)="setFilter('today')">Today</button>
-  <button type="button" class="chip" [class.active]="isActive('tomorrow')" (click)="setFilter('tomorrow')">Tomorrow</button>
-  <button type="button" class="chip" [class.active]="isActive('week')" (click)="setFilter('week')">Week</button>
-  <button type="button" class="chip" [class.active]="isActive('all')" (click)="setFilter('all')">All</button>
-  <button type="button" class="chip" [class.active]="isActive('done')" (click)="setFilter('done')">Done</button>
+  <button type="button" class="chip" [class.active]="isActive('today')" (click)="setFilter('today')">
+    {{ 'filters.today' | t }}
+  </button>
+  <button type="button" class="chip" [class.active]="isActive('tomorrow')" (click)="setFilter('tomorrow')">
+    {{ 'filters.tomorrow' | t }}
+  </button>
+  <button type="button" class="chip" [class.active]="isActive('week')" (click)="setFilter('week')">
+    {{ 'filters.week' | t }}
+  </button>
+  <button type="button" class="chip" [class.active]="isActive('all')" (click)="setFilter('all')">
+    {{ 'filters.all' | t }}
+  </button>
+  <button type="button" class="chip" [class.active]="isActive('done')" (click)="setFilter('done')">
+    {{ 'filters.done' | t }}
+  </button>
 </div>

@@ -1,7 +1,7 @@
 <section class="card card-pad">
   <div class="card-head">
-    <h3 class="h3">Priority list</h3>
-    <div class="muted">{{ items.length }} items</div>
+    <h3 class="h3">{{ 'plist.title' | t }}</h3>
+    <div class="muted">{{ 'plist.count' | t:{count: items.length} }}</div>
   </div>
 
   <div class="plist" *ngIf="items.length > 0; else empty">
@@ -14,11 +14,13 @@
         </div>
 
         <div class="right">
-          <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+          <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
+
           <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
-            {{ x.task.isDone ? 'Undone' : 'Done' }}
+            {{ x.task.isDone ? ('actions.undone' | t) : ('actions.done' | t) }}
           </button>
-          <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
+
+          <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">{{ 'actions.delete' | t }}</button>
         </div>
       </div>
 
@@ -35,6 +37,6 @@
   </div>
 
   <ng-template #empty>
-    <div class="muted">No tasks for this filter.</div>
+    <div class="muted">{{ 'plist.empty' | t }}</div>
   </ng-template>
 </section>

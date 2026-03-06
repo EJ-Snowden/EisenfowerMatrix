@@ -1,32 +1,48 @@
 <section class="page">
   <div class="hero">
-    <div class="hero-title">{{ mode === 'signup' ? 'Create account' : 'Sign in' }}</div>
+    <div class="hero-title">
+      {{ mode === 'signup' ? ('auth.signup.title' | t) : ('auth.signin.title' | t) }}
+    </div>
     <div class="hero-sub muted">
-      Private tasks, synced in the cloud
+      {{ 'auth.tagline' | t }}
     </div>
   </div>
 
   <div class="card card-pad auth-card">
     <form class="form" (ngSubmit)="submit()">
       <div class="field">
-        <label class="label">Email</label>
-        <input class="input" type="email" [formControl]="form.controls.email" placeholder="name@email.com" />
+        <label class="label">{{ 'auth.email' | t }}</label>
+        <input
+          class="input"
+          type="email"
+          [formControl]="form.controls.email"
+          [placeholder]="'auth.email.placeholder' | t"
+        />
       </div>
 
       <div class="field">
-        <label class="label">Password</label>
-        <input class="input" type="password" [formControl]="form.controls.password" placeholder="min 6 chars" />
+        <label class="label">{{ 'auth.password' | t }}</label>
+        <input
+          class="input"
+          type="password"
+          [formControl]="form.controls.password"
+          [placeholder]="'auth.password.placeholder' | t"
+        />
       </div>
 
-      <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="error" *ngIf="errorKey">{{ errorKey | t }}</div>
 
       <div class="actions">
         <button class="btn btn-primary" type="submit" [disabled]="loading || form.invalid">
-          {{ loading ? '...' : (mode === 'signup' ? 'Sign up' : 'Sign in') }}
+          {{
+            loading
+              ? '...'
+              : (mode === 'signup' ? ('auth.btn.signup' | t) : ('auth.btn.signin' | t))
+          }}
         </button>
 
         <button class="btn btn-ghost" type="button" (click)="switchMode()" [disabled]="loading">
-          {{ mode === 'signup' ? 'I already have an account' : 'Create account' }}
+          {{ mode === 'signup' ? ('auth.btn.toSignin' | t) : ('auth.btn.toSignup' | t) }}
         </button>
       </div>
     </form>

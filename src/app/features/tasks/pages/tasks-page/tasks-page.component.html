@@ -1,8 +1,8 @@
 <section class="page">
   <div class="head">
     <div class="head-left">
-      <h2 class="h2">Tasks</h2>
-      <div class="muted2">Matrix + priority score</div>
+      <h2 class="h2">{{ 'tasks.title' | t }}</h2>
+      <div class="muted2">{{ 'tasks.subtitle' | t }}</div>
     </div>
 
     <app-filters [active]="activeFilter" (filterChange)="onFilterChange($event)"></app-filters>
@@ -10,8 +10,8 @@
 
   <div class="card card-pad">
     <div class="card-head">
-      <h3 class="h3">Create</h3>
-      <div class="muted">Simple or Advanced</div>
+      <h3 class="h3">{{ 'tasks.create.title' | t }}</h3>
+      <div class="muted">{{ 'tasks.create.hint' | t }}</div>
     </div>
 
     <app-task-form (createTask)="onCreateTask($event)"></app-task-form>
@@ -43,8 +43,10 @@
     <div class="modal" *ngIf="t">
       <div class="card card-pad modal-card">
         <div class="card-head">
-          <h3 class="h3">Edit</h3>
-          <button class="btn btn-ghost btn-xs" type="button" (click)="closeEdit()">Close</button>
+          <h3 class="h3">{{ 'tasks.edit.title' | t }}</h3>
+          <button class="btn btn-ghost btn-xs" type="button" (click)="closeEdit()">
+            {{ 'app.close' | t }}
+          </button>
         </div>
 
         <app-task-form

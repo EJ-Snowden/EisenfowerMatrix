@@ -55,6 +55,40 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lang-ico {
+  opacity: 0.9;
+  display: inline-flex;
+}
+
+.lang-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.lang-btn.active {
+  border-color: rgba(255, 59, 212, 0.34);
+  background: rgba(255, 59, 212, 0.10);
+  opacity: 1;
 }
 
 .user {

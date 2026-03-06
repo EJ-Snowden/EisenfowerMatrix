@@ -1,32 +1,38 @@
 <section class="card">
   <div class="top">
-    <h3 class="title">{{ editTask ? 'Edit task' : 'Add task' }}</h3>
+    <h3 class="title">{{ editTask ? ('form.edit' | t) : ('form.add' | t) }}</h3>
 
     <button type="button" class="link" (click)="toggleAdvanced()">
-      {{ isAdvanced ? 'Simple' : 'Advanced' }}
+      {{ isAdvanced ? ('form.simple' | t) : ('form.advanced' | t) }}
     </button>
   </div>
 
   <form class="grid" [formGroup]="form" (ngSubmit)="submit()">
     <div class="field col-2">
-      <label>Title</label>
-      <input type="text" formControlName="title" placeholder="What to do?" />
-      <div class="error" *ngIf="titleInvalid">Title is required (min 2 chars)</div>
+      <label class="label">{{ 'form.title' | t }}</label>
+      <input
+        class="input"
+        type="text"
+        formControlName="title"
+        [placeholder]="'form.title.placeholder' | t"
+      />
+      <div class="error" *ngIf="titleInvalid">{{ 'form.title.error' | t }}</div>
     </div>
 
     <div class="field">
-      <label>Due date</label>
-      <input type="date" formControlName="dueDate" />
+      <label class="label">{{ 'form.duedate' | t }}</label>
+      <input class="input" type="date" formControlName="dueDate" />
       <div class="row">
-        <button type="button" class="btn small" (click)="setToday()">Today</button>
-        <button type="button" class="btn small" (click)="setTomorrow()">Tomorrow</button>
+        <button type="button" class="btn btn-xs" (click)="setToday()">{{ 'form.today' | t }}</button>
+        <button type="button" class="btn btn-xs" (click)="setTomorrow()">{{ 'form.tomorrow' | t }}</button>
       </div>
     </div>
 
     <div class="field">
-      <label>Importance: {{ form.controls.importance.value }}</label>
+      <label class="label">{{ 'form.importance' | t:{v: (form.controls.importance.value ?? 0)} }}</label>
 
       <input
+        class="range"
         type="range"
         min="0"
         max="100"
@@ -36,6 +42,7 @@
       />
 
       <input
+        class="input"
         type="number"
         min="0"
         max="100"
@@ -46,9 +53,10 @@
     </div>
 
     <div class="field">
-      <label>Urgency feeling: {{ form.controls.urgencyFeeling.value }}</label>
+      <label class="label">{{ 'form.urgency' | t:{v: (form.controls.urgencyFeeling.value ?? 0)} }}</label>
 
       <input
+        class="range"
         type="range"
         min="0"
         max="100"
@@ -58,6 +66,7 @@
       />
 
       <input
+        class="input"
         type="number"
         min="0"
         max="100"
@@ -68,7 +77,7 @@
     </div>
 
     <div class="field col-2">
-      <label>Effort</label>
+      <label class="label">{{ 'form.effort' | t }}</label>
       <div class="chips">
         <button
           type="button"
@@ -84,47 +93,55 @@
 
     <ng-container *ngIf="isAdvanced">
       <div class="field">
-        <label>Energy</label>
-        <select formControlName="energy">
-          <option *ngFor="let x of energyOptions" [value]="x.value">{{ x.label }}</option>
+        <label class="label">{{ 'form.energy' | t }}</label>
+        <select class="select" formControlName="energy">
+          <option *ngFor="let x of energyOptions" [ngValue]="x">
+            {{ ('energy.' + x) | t }}
+          </option>
         </select>
       </div>
 
       <div class="field">
-        <label>Commitment</label>
-        <select formControlName="commitment">
-          <option *ngFor="let x of commitmentOptions" [value]="x.value">{{ x.label }}</option>
+        <label class="label">{{ 'form.commitment' | t }}</label>
+        <select class="select" formControlName="commitment">
+          <option *ngFor="let x of commitmentOptions" [ngValue]="x">
+            {{ ('commitment.' + x) | t }}
+          </option>
         </select>
       </div>
 
       <div class="field">
-        <label>Penalty</label>
-        <select formControlName="penalty">
-          <option *ngFor="let x of penaltyOptions" [value]="x.value">{{ x.label }}</option>
+        <label class="label">{{ 'form.penalty' | t }}</label>
+        <select class="select" formControlName="penalty">
+          <option *ngFor="let x of penaltyOptions" [ngValue]="x">
+            {{ ('penalty.' + x) | t }}
+          </option>
         </select>
       </div>
 
       <div class="field">
-        <label>Category</label>
-        <select formControlName="category">
-          <option value="">None</option>
-          <option *ngFor="let x of categoryOptions" [value]="x.value">{{ x.label }}</option>
+        <label class="label">{{ 'form.category' | t }}</label>
+        <select class="select" formControlName="category">
+          <option [ngValue]="''">{{ 'form.none' | t }}</option>
+          <option *ngFor="let x of categoryOptions" [ngValue]="x">
+            {{ ('category.' + x) | t }}
+          </option>
         </select>
       </div>
 
       <div class="field col-2">
-        <label>Notes</label>
-        <textarea rows="3" formControlName="notes"></textarea>
+        <label class="label">{{ 'form.notes' | t }}</label>
+        <textarea class="textarea" rows="3" formControlName="notes"></textarea>
       </div>
     </ng-container>
 
     <div class="actions col-2">
-      <button type="submit" class="btn primary" [disabled]="form.invalid">
-        {{ editTask ? 'Save' : 'Add' }}
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+        {{ editTask ? ('form.btn.save' | t) : ('form.btn.add' | t) }}
       </button>
 
-      <button type="button" class="btn" (click)="clear()">
-        {{ editTask ? 'Cancel' : 'Clear' }}
+      <button type="button" class="btn btn-ghost" (click)="clear()">
+        {{ editTask ? ('form.btn.cancel' | t) : ('form.btn.clear' | t) }}
       </button>
     </div>
   </form>

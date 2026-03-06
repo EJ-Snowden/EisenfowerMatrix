@@ -3,11 +3,12 @@ import { Component, inject } from '@angular/core';
 import {ReactiveFormsModule, Validators, FormBuilder, FormsModule} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TPipe } from '../../../../core/i18n/t.pipe';
 
 @Component({
   selector: 'app-auth-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TPipe, FormsModule],
   templateUrl: './auth-page.component.html',
   styleUrl: './auth-page.component.css',
 })
@@ -17,7 +18,7 @@ export class AuthPageComponent {
   private readonly router = inject(Router);
 
   mode: 'signin' | 'signup' = 'signin';
-  error: string | null = null;
+  errorKey: string | null = null;
   loading = false;
 
   form = this.fb.group({
@@ -27,7 +28,7 @@ export class AuthPageComponent {
 
   switchMode(): void {
     this.mode = this.mode === 'signin' ? 'signup' : 'signin';
-    this.error = null;
+    this.errorKey = null;
   }
 
   async submit(): Promise<void> {
@@ -37,7 +38,7 @@ export class AuthPageComponent {
     }
 
     this.loading = true;
-    this.error = null;
+    this.errorKey = null;
 
     const email = String(this.form.value.email ?? '').trim();
     const password = String(this.form.value.password ?? '');
@@ -50,17 +51,17 @@ export class AuthPageComponent {
       }
       await this.router.navigateByUrl('/tasks');
     } catch (e: any) {
-      this.error = this.prettyError(e);
+      this.errorKey = this.prettyErrorKey(e);
     } finally {
       this.loading = false;
     }
   }
 
-  private prettyError(e: any): string {
+  private prettyErrorKey(e: any): string {
     const msg = String(e?.message ?? e ?? '');
-    if (msg.includes('auth/invalid-credential')) return 'Invalid email or password';
-    if (msg.includes('auth/email-already-in-use')) return 'Email already in use';
-    if (msg.includes('auth/weak-password')) return 'Password is too weak';
-    return msg || 'Unknown error';
+    if (msg.includes('auth/invalid-credential')) return 'auth.err.invalidCredential';
+    if (msg.includes('auth/email-already-in-use')) return 'auth.err.emailInUse';
+    if (msg.includes('auth/weak-password')) return 'auth.err.weakPassword';
+    return 'auth.err.unknown';
   }
 }

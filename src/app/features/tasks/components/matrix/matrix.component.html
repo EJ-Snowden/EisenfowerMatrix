@@ -1,16 +1,16 @@
 <section class="card card-pad">
   <div class="card-head">
     <div class="head-left">
-      <h3 class="h3">Eisenhower Matrix</h3>
-      <div class="muted">{{ items.length }} tasks</div>
+      <h3 class="h3">{{ 'matrix.title' | t }}</h3>
+      <div class="muted">{{ 'matrix.count' | t:{count: items.length} }}</div>
     </div>
 
     <div class="head-right">
       <button type="button" class="chip" [class.active]="viewMode === 'quadrants'" (click)="setView('quadrants')">
-        Quadrants
+        {{ 'matrix.view.quadrants' | t }}
       </button>
       <button type="button" class="chip" [class.active]="viewMode === 'plot'" (click)="setView('plot')">
-        Plot
+        {{ 'matrix.view.plot' | t }}
       </button>
     </div>
   </div>
@@ -20,161 +20,132 @@
       <div class="cell q1">
         <div class="cell-title">
           <span class="dot-mini"></span>
-          <span>{{ titleOf('Q1') }}</span>
+          <span>{{ titleKeyOf('Q1') | t }}</span>
           <span class="count">{{ q1.length }}</span>
         </div>
-
         <div class="list" *ngIf="q1.length; else empty1">
           <div class="item" *ngFor="let x of q1; trackBy: trackById" [class.done]="x.task.isDone">
             <div class="row">
               <div class="name">{{ x.task.title }}</div>
               <div class="score">{{ x.score | number: '1.0-0' }}</div>
             </div>
-
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
               <span class="pill">{{ x.task.energy }}</span>
               <span class="pill">{{ x.task.penalty }}</span>
             </div>
-
             <div class="actions">
-              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
               <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
-                {{ x.task.isDone ? 'Undone' : 'Done' }}
+                {{ x.task.isDone ? ('actions.undone' | t) : ('actions.done' | t) }}
               </button>
-              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
+              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">{{ 'actions.delete' | t }}</button>
             </div>
           </div>
         </div>
-
-        <ng-template #empty1><div class="empty">Empty</div></ng-template>
+        <ng-template #empty1><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
 
       <div class="cell q2">
         <div class="cell-title">
           <span class="dot-mini"></span>
-          <span>{{ titleOf('Q2') }}</span>
+          <span>{{ titleKeyOf('Q2') | t }}</span>
           <span class="count">{{ q2.length }}</span>
         </div>
-
         <div class="list" *ngIf="q2.length; else empty2">
           <div class="item" *ngFor="let x of q2; trackBy: trackById" [class.done]="x.task.isDone">
             <div class="row">
               <div class="name">{{ x.task.title }}</div>
               <div class="score">{{ x.score | number: '1.0-0' }}</div>
             </div>
-
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
               <span class="pill">{{ x.task.energy }}</span>
               <span class="pill">{{ x.task.penalty }}</span>
             </div>
-
             <div class="actions">
-              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
               <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
-                {{ x.task.isDone ? 'Undone' : 'Done' }}
+                {{ x.task.isDone ? ('actions.undone' | t) : ('actions.done' | t) }}
               </button>
-              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
+              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">{{ 'actions.delete' | t }}</button>
             </div>
           </div>
         </div>
-
-        <ng-template #empty2><div class="empty">Empty</div></ng-template>
+        <ng-template #empty2><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
 
       <div class="cell q3">
         <div class="cell-title">
           <span class="dot-mini"></span>
-          <span>{{ titleOf('Q3') }}</span>
+          <span>{{ titleKeyOf('Q3') | t }}</span>
           <span class="count">{{ q3.length }}</span>
         </div>
-
         <div class="list" *ngIf="q3.length; else empty3">
           <div class="item" *ngFor="let x of q3; trackBy: trackById" [class.done]="x.task.isDone">
             <div class="row">
               <div class="name">{{ x.task.title }}</div>
               <div class="score">{{ x.score | number: '1.0-0' }}</div>
             </div>
-
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
               <span class="pill">{{ x.task.energy }}</span>
               <span class="pill">{{ x.task.penalty }}</span>
             </div>
-
             <div class="actions">
-              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
               <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
-                {{ x.task.isDone ? 'Undone' : 'Done' }}
+                {{ x.task.isDone ? ('actions.undone' | t) : ('actions.done' | t) }}
               </button>
-              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
+              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">{{ 'actions.delete' | t }}</button>
             </div>
           </div>
         </div>
-
-        <ng-template #empty3><div class="empty">Empty</div></ng-template>
+        <ng-template #empty3><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
 
       <div class="cell q4">
         <div class="cell-title">
           <span class="dot-mini"></span>
-          <span>{{ titleOf('Q4') }}</span>
+          <span>{{ titleKeyOf('Q4') | t }}</span>
           <span class="count">{{ q4.length }}</span>
         </div>
-
         <div class="list" *ngIf="q4.length; else empty4">
           <div class="item" *ngFor="let x of q4; trackBy: trackById" [class.done]="x.task.isDone">
             <div class="row">
               <div class="name">{{ x.task.title }}</div>
               <div class="score">{{ x.score | number: '1.0-0' }}</div>
             </div>
-
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
               <span class="pill">{{ x.task.energy }}</span>
               <span class="pill">{{ x.task.penalty }}</span>
             </div>
-
             <div class="actions">
-              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">Edit</button>
+              <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
               <button type="button" class="btn btn-xs" (click)="onToggleDone(x.task.id)">
-                {{ x.task.isDone ? 'Undone' : 'Done' }}
+                {{ x.task.isDone ? ('actions.undone' | t) : ('actions.done' | t) }}
               </button>
-              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">Delete</button>
+              <button type="button" class="btn btn-xs btn-danger" (click)="onDelete(x.task.id)">{{ 'actions.delete' | t }}</button>
             </div>
           </div>
         </div>
-
-        <ng-template #empty4><div class="empty">Empty</div></ng-template>
+        <ng-template #empty4><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
     </div>
   </ng-container>
 
   <ng-container *ngIf="viewMode === 'plot'">
-    <div
-      class="plot"
-      #plot
-      (mousemove)="onPlotMove($event, plot)"
-      (mouseleave)="leaveDot()"
-    >
-      <div class="axis-label x">Urgency</div>
-      <div class="axis-label y">Importance</div>
+    <div class="plot" #plot (mousemove)="onPlotMove($event, plot)" (mouseleave)="leaveDot()">
+      <div class="axis-label x">{{ 'matrix.axis.urgency' | t }}</div>
+      <div class="axis-label y">{{ 'matrix.axis.importance' | t }}</div>
 
       <div class="mid v"></div>
       <div class="mid h"></div>
-
-      <div class="tick t0x">0</div>
-      <div class="tick t50x">50</div>
-      <div class="tick t100x">100</div>
-
-      <div class="tick t0y">0</div>
-      <div class="tick t50y">50</div>
-      <div class="tick t100y">100</div>
 
       <div
         *ngFor="let x of items; trackBy: trackById"
@@ -187,12 +158,7 @@
         title="Click to edit"
       ></div>
 
-      <div
-        class="tooltip"
-        *ngIf="hovered"
-        [style.left.px]="mouseX + 12"
-        [style.top.px]="mouseY + 12"
-      >
+      <div class="tooltip" *ngIf="hovered" [style.left.px]="mouseX + 12" [style.top.px]="mouseY + 12">
         <div class="tt-title">{{ hovered.task.title }}</div>
         <div class="tt-row">
           <span class="pill pill-accent">{{ hovered.quadrant }}</span>
@@ -200,13 +166,15 @@
           <span class="pill">{{ hovered.task.dueDate }}</span>
         </div>
         <div class="tt-row muted">
-          I {{ hovered.task.importance }} | U {{ hovered.task.urgencyFeeling }} | {{ hovered.task.effortMinutes }}m
+          {{ 'matrix.tooltip.i' | t:{i: hovered.task.importance} }}
+          |
+          {{ 'matrix.tooltip.u' | t:{u: hovered.task.urgencyFeeling} }}
+          |
+          {{ 'matrix.tooltip.effort' | t:{m: hovered.task.effortMinutes} }}
         </div>
       </div>
     </div>
 
-    <div class="plot-hint muted">
-      Quadrant lines are at 50/50. Click a dot to edit.
-    </div>
+    <div class="plot-hint muted">{{ 'matrix.hint' | t }}</div>
   </ng-container>
 </section>

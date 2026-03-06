@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { RankedTask, Quadrant } from '../../../../models/task.model';
+import { TPipe } from '../../../../core/i18n/t.pipe';
 
 type ViewMode = 'quadrants' | 'plot';
 
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TPipe],
   templateUrl: './matrix.component.html',
   styleUrl: './matrix.component.css',
 })
@@ -25,7 +26,7 @@ export class MatrixComponent implements OnChanges {
   q3: RankedTask[] = [];
   q4: RankedTask[] = [];
 
-  private readonly plotPad = 4
+  private readonly plotPad = 4;
 
   hovered: RankedTask | null = null;
   mouseX = 0;
@@ -48,16 +49,16 @@ export class MatrixComponent implements OnChanges {
     this.q4 = this.items.filter((x) => x.quadrant === 'Q4').sort(byScoreDesc);
   }
 
-  titleOf(q: Quadrant): string {
+  titleKeyOf(q: Quadrant): string {
     switch (q) {
       case 'Q1':
-        return 'Q1 - Urgent and Important';
+        return 'matrix.q1';
       case 'Q2':
-        return 'Q2 - Not Urgent and Important';
+        return 'matrix.q2';
       case 'Q3':
-        return 'Q3 - Urgent and Not Important';
+        return 'matrix.q3';
       case 'Q4':
-        return 'Q4 - Not Urgent and Not Important';
+        return 'matrix.q4';
     }
   }
 
@@ -84,7 +85,7 @@ export class MatrixComponent implements OnChanges {
 
   yPos(item: RankedTask): number {
     const imp = this.clampInt(Number(item.task.importance), 0, 100) / 100;
-    const y = 1 - imp; // 1 => bottom, 0 => top
+    const y = 1 - imp;
     return this.plotPad + y * (100 - 2 * this.plotPad);
   }
 

@@ -6,18 +6,18 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 
 import { TASKS_REPOSITORY } from '../../../../core/repositories/tasks-repository.token';
 import { TasksRepository } from '../../../../core/repositories/tasks-repository';
 import {
-  RankedTask,
-  Quadrant,
   TaskItem,
   Category,
   EnergyLevel,
   CommitmentLevel,
   PenaltyLevel,
+  Quadrant,
+  RankedTask,
 } from '../../../../models/task.model';
 import { TaskFilter } from '../../models/task-filter.model';
 import { TaskSort } from '../../models/task-sort.model';
@@ -68,15 +68,35 @@ export class TasksPageComponent {
   deleteId: string | null = null;
   flashKey: string | null = null;
 
+  private readonly filter$ = new BehaviorSubject<TaskFilter>(this.filter);
+  private readonly sort$ = new BehaviorSubject<TaskSort>(this.sort);
+  private readonly search$ = new BehaviorSubject<string>(this.search);
+  private readonly selectedDate$ = new BehaviorSubject<string>(this.selectedDate);
+  private readonly editingId$ = new BehaviorSubject<string | null>(this.editingId);
+  private readonly deleteId$ = new BehaviorSubject<string | null>(this.deleteId);
+
   readonly tasks$ = this.repo.tasks$;
 
-  readonly vm$ = combineLatest([this.tasks$, this.i18n.lang$]).pipe(
-    map(([tasks]) => {
+  readonly vm$ = combineLatest([
+    this.tasks$,
+    this.i18n.lang$,
+    this.filter$,
+    this.sort$,
+    this.search$,
+    this.selectedDate$,
+    this.editingId$,
+    this.deleteId$,
+  ]).pipe(
+    map(([tasks, _lang, filter, sort, search, selectedDate, editingId, deleteId]) => {
       const ranked = tasks.map((task) => this.rankTask(task));
-      const filtered = ranked.filter((x) => this.matchesFilter(x.task) && this.matchesSearch(x.task));
-      const sorted = [...filtered].sort((a, b) => this.compareRanked(a, b));
-      const editingTask = this.editingId ? tasks.find((x) => x.id === this.editingId) ?? null : null;
-      const deleteTask = this.deleteId ? tasks.find((x) => x.id === this.deleteId) ?? null : null;
+      const filtered = ranked.filter(
+        (x) =>
+          this.matchesFilter(x.task, filter, selectedDate) &&
+          this.matchesSearch(x.task, search)
+      );
+      const sorted = [...filtered].sort((a, b) => this.compareRanked(a, b, sort));
+      const editingTask = editingId ? tasks.find((x) => x.id === editingId) ?? null : null;
+      const deleteTask = deleteId ? tasks.find((x) => x.id === deleteId) ?? null : null;
 
       return {
         allTasks: tasks,
@@ -92,6 +112,7 @@ export class TasksPageComponent {
     if (this.deleteId) {
       event.preventDefault();
       this.deleteId = null;
+      this.deleteId$.next(null);
       return;
     }
 
@@ -104,28 +125,33 @@ export class TasksPageComponent {
   openCreate(): void {
     this.flashKey = null;
     this.editingId = null;
+    this.editingId$.next(null);
     this.isFormOpen = true;
   }
 
   openEdit(id: string): void {
     this.flashKey = null;
     this.editingId = id;
+    this.editingId$.next(id);
     this.isFormOpen = true;
   }
 
   closeForm(): void {
     this.isFormOpen = false;
     this.editingId = null;
+    this.editingId$.next(null);
   }
 
   requestDelete(id: string): void {
     this.deleteId = id;
+    this.deleteId$.next(id);
   }
 
   confirmDelete(): void {
     if (!this.deleteId) return;
     this.repo.delete(this.deleteId);
     this.deleteId = null;
+    this.deleteId$.next(null);
   }
 
   toggleDone(taskId: string, tasks: TaskItem[]): void {
@@ -165,19 +191,27 @@ export class TasksPageComponent {
 
   setFilter(filter: TaskFilter): void {
     this.filter = filter;
+    this.filter$.next(filter);
   }
 
   setSort(sort: TaskSort): void {
     this.sort = sort;
+    this.sort$.next(sort);
   }
 
   setSearch(search: string): void {
     this.search = search;
+    this.search$.next(search);
   }
 
   setSelectedDate(date: string): void {
     this.selectedDate = date || this.selectedDate;
-    if (date) this.filter = 'date';
+    this.selectedDate$.next(this.selectedDate);
+
+    if (date) {
+      this.filter = 'date';
+      this.filter$.next('date');
+    }
   }
 
   exportJson(tasks: TaskItem[]): void {
@@ -261,7 +295,11 @@ export class TasksPageComponent {
       energy: this.oneOf<EnergyLevel>(input.energy, ['low', 'medium', 'high'], 'medium'),
       commitment: this.oneOf<CommitmentLevel>(input.commitment, ['none', 'soft', 'hard'], 'none'),
       penalty: this.oneOf<PenaltyLevel>(input.penalty, ['low', 'medium', 'high'], 'medium'),
-      category: this.oneOf<Category | undefined>(input.category, ['work', 'home', 'health', 'people', 'self'], undefined),
+      category: this.oneOf<Category | undefined>(
+        input.category,
+        ['work', 'home', 'health', 'people', 'self'],
+        undefined
+      ),
       isDone,
       doneAt,
       createdAt,
@@ -295,7 +333,13 @@ export class TasksPageComponent {
     const energyMap: Record<EnergyLevel, number> = { low: 6, medium: 3, high: 0 };
     const commitmentMap: Record<CommitmentLevel, number> = { none: 0, soft: 6, hard: 12 };
     const penaltyMap: Record<PenaltyLevel, number> = { low: 4, medium: 10, high: 18 };
-    const categoryMap: Partial<Record<Category, number>> = { work: 10, health: 11, home: 6, people: 7, self: 5 };
+    const categoryMap: Partial<Record<Category, number>> = {
+      work: 10,
+      health: 11,
+      home: 6,
+      people: 7,
+      self: 5,
+    };
 
     const effortPenalty = Math.min(18, Math.round(task.effortMinutes / 18));
 
@@ -339,16 +383,16 @@ export class TasksPageComponent {
     return 'Q4';
   }
 
-  private matchesFilter(task: TaskItem): boolean {
+  private matchesFilter(task: TaskItem, filter: TaskFilter, selectedDate: string): boolean {
     const today = this.startOfToday();
     const todayStr = this.dateOnly(today);
     const tomorrowStr = this.dateOnly(this.addDays(today, 1));
     const due = task.dueDate;
 
-    if (this.filter === 'done') return task.isDone;
+    if (filter === 'done') return task.isDone;
     if (task.isDone) return false;
 
-    switch (this.filter) {
+    switch (filter) {
       case 'today':
         return due === todayStr;
       case 'tomorrow':
@@ -361,23 +405,23 @@ export class TasksPageComponent {
       case 'overdue':
         return due < todayStr;
       case 'date':
-        return due === this.selectedDate;
+        return due === selectedDate;
       case 'all':
       default:
         return true;
     }
   }
 
-  private matchesSearch(task: TaskItem): boolean {
-    const query = this.search.trim().toLowerCase();
+  private matchesSearch(task: TaskItem, search: string): boolean {
+    const query = search.trim().toLowerCase();
     if (!query) return true;
 
     const hay = `${task.title} ${task.notes ?? ''}`.toLowerCase();
     return hay.includes(query);
   }
 
-  private compareRanked(a: RankedTask, b: RankedTask): number {
-    switch (this.sort) {
+  private compareRanked(a: RankedTask, b: RankedTask, sort: TaskSort): number {
+    switch (sort) {
       case 'dueDateAsc':
         return a.task.dueDate.localeCompare(b.task.dueDate) || b.score - a.score;
       case 'dueDateDesc':

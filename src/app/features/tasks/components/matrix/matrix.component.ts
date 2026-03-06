@@ -19,14 +19,15 @@ export class MatrixComponent implements OnChanges {
   @Output() deleteTask = new EventEmitter<string>();
   @Output() editTask = new EventEmitter<string>();
 
-  viewMode: ViewMode = 'quadrants';
+  private readonly storageKey = 'em_matrix_view_mode';
+  private readonly plotPad = 4;
+
+  viewMode: ViewMode = this.loadViewMode();
 
   q1: RankedTask[] = [];
   q2: RankedTask[] = [];
   q3: RankedTask[] = [];
   q4: RankedTask[] = [];
-
-  private readonly plotPad = 4;
 
   hovered: RankedTask | null = null;
   mouseX = 0;
@@ -38,6 +39,7 @@ export class MatrixComponent implements OnChanges {
 
   setView(mode: ViewMode): void {
     this.viewMode = mode;
+    this.saveViewMode(mode);
   }
 
   private rebuild(): void {
@@ -77,14 +79,15 @@ export class MatrixComponent implements OnChanges {
   }
 
   xPos(item: RankedTask): number {
-    const u = this.clampInt(Number(item.task.urgencyFeeling), 0, 100) / 100;
-    return this.plotPad + u * (100 - 2 * this.plotPad);
+    const urgency = this.clampInt(Number(item.task.urgencyFeeling), 0, 100) / 100;
+    const reversedX = 1 - urgency;
+    return this.plotPad + reversedX * (100 - 2 * this.plotPad);
   }
 
   yPos(item: RankedTask): number {
-    const imp = this.clampInt(Number(item.task.importance), 0, 100) / 100;
-    const y = 1 - imp;
-    return this.plotPad + y * (100 - 2 * this.plotPad);
+    const importance = this.clampInt(Number(item.task.importance), 0, 100) / 100;
+    const reversedY = 1 - importance;
+    return this.plotPad + reversedY * (100 - 2 * this.plotPad);
   }
 
   dotClass(item: RankedTask): string {
@@ -108,5 +111,20 @@ export class MatrixComponent implements OnChanges {
   private clampInt(v: number, min: number, max: number): number {
     if (!Number.isFinite(v)) return min;
     return Math.max(min, Math.min(max, Math.round(v)));
+  }
+
+  private loadViewMode(): ViewMode {
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      return saved === 'plot' ? 'plot' : 'quadrants';
+    } catch {
+      return 'quadrants';
+    }
+  }
+
+  private saveViewMode(mode: ViewMode): void {
+    try {
+      localStorage.setItem(this.storageKey, mode);
+    } catch {}
   }
 }

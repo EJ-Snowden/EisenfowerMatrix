@@ -45,6 +45,21 @@ body {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+}
+
+.select {
+  appearance: auto;
+  color-scheme: dark;
+}
+
+.select option,
+.select optgroup {
+  background: #171720;
+  color: rgba(255, 255, 255, 0.92);
+}
+
 ::selection {
   background: rgba(255, 59, 212, 0.25);
 }

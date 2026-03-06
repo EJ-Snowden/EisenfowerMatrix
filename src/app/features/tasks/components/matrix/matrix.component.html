@@ -50,7 +50,6 @@
         <ng-template #empty1><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
 
-
       <div class="cell q2">
         <div class="cell-title">
           <span class="dot-mini"></span>
@@ -154,8 +153,18 @@
 
   <ng-container *ngIf="viewMode === 'plot'">
     <div class="plot" #plot (mousemove)="onPlotMove($event, plot)" (mouseleave)="leaveDot()">
-      <div class="axis-label x">{{ 'matrix.axis.urgency' | t }}</div>
       <div class="axis-label y">{{ 'matrix.axis.importance' | t }}</div>
+      <div class="axis-label x">{{ 'matrix.axis.urgency' | t }}</div>
+
+      <div class="tick tx-left">100</div>
+      <div class="tick tx-right">0</div>
+      <div class="tick ty-top">100</div>
+      <div class="tick ty-bottom">0</div>
+
+      <div class="quad-tag tl">Q1</div>
+      <div class="quad-tag tr">Q2</div>
+      <div class="quad-tag bl">Q3</div>
+      <div class="quad-tag br">Q4</div>
 
       <div class="mid v"></div>
       <div class="mid h"></div>
@@ -190,3 +199,4 @@
     <div class="plot-hint muted">{{ 'matrix.hint' | t }}</div>
   </ng-container>
 </section>
+

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import {ReactiveFormsModule, Validators, FormBuilder, FormsModule} from '@angular/forms';
+import { ChangeDetectorRef, Component, NgZone, inject } from '@angular/core';
+import { ReactiveFormsModule, Validators, FormBuilder, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { TPipe } from '../../../../core/i18n/t.pipe';
@@ -16,6 +16,8 @@ export class AuthPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly zone = inject(NgZone);
 
   mode: 'signin' | 'signup' = 'signin';
   errorKey: string | null = null;
@@ -39,6 +41,7 @@ export class AuthPageComponent {
 
     this.loading = true;
     this.errorKey = null;
+    this.cdr.detectChanges();
 
     const email = String(this.form.value.email ?? '').trim();
     const password = String(this.form.value.password ?? '');
@@ -49,19 +52,39 @@ export class AuthPageComponent {
       } else {
         await this.auth.signIn(email, password);
       }
+
       await this.router.navigateByUrl('/tasks');
     } catch (e: any) {
-      this.errorKey = this.prettyErrorKey(e);
+      this.zone.run(() => {
+        this.errorKey = this.prettyErrorKey(e);
+        this.cdr.detectChanges();
+      });
     } finally {
-      this.loading = false;
+      this.zone.run(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      });
     }
   }
 
   private prettyErrorKey(e: any): string {
-    const msg = String(e?.message ?? e ?? '');
-    if (msg.includes('auth/invalid-credential')) return 'auth.err.invalidCredential';
-    if (msg.includes('auth/email-already-in-use')) return 'auth.err.emailInUse';
-    if (msg.includes('auth/weak-password')) return 'auth.err.weakPassword';
+    const code = String(e?.code ?? e?.message ?? e ?? '');
+
+    if (
+      code.includes('auth/invalid-credential') ||
+      code.includes('auth/invalid-login-credentials')
+    ) {
+      return 'auth.err.invalidCredential';
+    }
+
+    if (code.includes('auth/email-already-in-use')) {
+      return 'auth.err.emailInUse';
+    }
+
+    if (code.includes('auth/weak-password')) {
+      return 'auth.err.weakPassword';
+    }
+
     return 'auth.err.unknown';
   }
 }

@@ -5,6 +5,13 @@
   align-items: center;
 }
 
+.head-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -117,12 +124,18 @@
 }
 
 .plot {
+  position: relative;
+  width: 100%;
+  height: min(62vh, 520px);
+  min-height: 320px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.10);
   background:
     linear-gradient(0deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 20% 20%,
     linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 20% 20%,
     rgba(255, 255, 255, 0.02);
   overflow: hidden;
+  isolation: isolate;
   animation: plotEnter 260ms ease;
 }
 
@@ -140,16 +153,73 @@
   font-size: 12px;
   color: var(--muted);
   user-select: none;
+  z-index: 2;
 }
 
 .axis-label.x {
-  right: 10px;
+  left: 12px;
   bottom: 10px;
 }
 
 .axis-label.y {
-  left: 10px;
+  left: 12px;
   top: 10px;
+}
+
+.tick {
+  position: absolute;
+  font-size: 11px;
+  color: var(--muted2);
+  user-select: none;
+  z-index: 2;
+}
+
+.tx-left {
+  left: 8px;
+  bottom: 28px;
+}
+
+.tx-right {
+  right: 8px;
+  bottom: 28px;
+}
+
+.ty-top {
+  left: 88px;
+  top: 8px;
+}
+
+.ty-bottom {
+  left: 88px;
+  bottom: 8px;
+}
+
+.quad-tag {
+  position: absolute;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.34);
+  user-select: none;
+  z-index: 1;
+}
+
+.quad-tag.tl {
+  top: 16%;
+  left: 18%;
+}
+
+.quad-tag.tr {
+  top: 16%;
+  right: 18%;
+}
+
+.quad-tag.bl {
+  bottom: 16%;
+  left: 18%;
+}
+
+.quad-tag.br {
+  bottom: 16%;
+  right: 18%;
 }
 
 .mid {
@@ -181,6 +251,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   transition: transform 160ms ease, box-shadow 160ms ease;
   animation: dotPop 220ms ease;
+  z-index: 3;
 }
 
 .dot:hover {
@@ -203,9 +274,16 @@
   box-shadow: var(--shadowSoft);
   pointer-events: none;
   animation: tooltipIn 140ms ease;
+  z-index: 4;
 }
 
 .tt-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.tt-row {
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }

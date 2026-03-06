@@ -1,10 +1,39 @@
 <section class="card">
   <div class="top">
-    <h3 class="title">{{ editTask ? ('form.edit' | t) : ('form.add' | t) }}</h3>
+    <div>
+      <h3 class="title">{{ editTask ? ('form.edit' | t) : ('form.add' | t) }}</h3>
+      <div class="muted2 hotkeys">{{ 'form.hotkeys' | t }}</div>
+    </div>
 
-    <button type="button" class="link" (click)="toggleAdvanced()">
-      {{ isAdvanced ? ('form.simple' | t) : ('form.advanced' | t) }}
-    </button>
+    <div class="top-actions">
+      <button type="button" class="link" (click)="toggleAdvanced()">
+        {{ isAdvanced ? ('form.simple' | t) : ('form.advanced' | t) }}
+      </button>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="close()"
+        [attr.aria-label]="'app.close' | t"
+        [title]="'app.close' | t"
+      >
+        ×
+      </button>
+    </div>
+  </div>
+
+  <div class="preset-block">
+    <label class="label">{{ 'form.presets' | t }}</label>
+    <div class="chips">
+      <button
+        type="button"
+        class="chip"
+        *ngFor="let x of presetOptions"
+        (click)="applyPreset(x)"
+      >
+        {{ ('form.preset.' + x) | t }}
+      </button>
+    </div>
   </div>
 
   <form class="grid" [formGroup]="form" (ngSubmit)="submit()">
@@ -19,12 +48,20 @@
       <div class="error" *ngIf="titleInvalid">{{ 'form.title.error' | t }}</div>
     </div>
 
-    <div class="field">
+    <div class="field col-2">
       <label class="label">{{ 'form.duedate' | t }}</label>
       <input class="input" type="date" formControlName="dueDate" />
+
       <div class="row">
         <button type="button" class="btn btn-xs" (click)="setToday()">{{ 'form.today' | t }}</button>
         <button type="button" class="btn btn-xs" (click)="setTomorrow()">{{ 'form.tomorrow' | t }}</button>
+        <button type="button" class="btn btn-xs" (click)="setInDays(3)">{{ 'form.plus3' | t }}</button>
+        <button type="button" class="btn btn-xs" (click)="setNextWeek()">{{ 'form.nextWeek' | t }}</button>
+        <button type="button" class="btn btn-xs" (click)="setNextMonth()">{{ 'form.nextMonth' | t }}</button>
+      </div>
+
+      <div class="date-preview muted">
+        {{ 'form.datePreview' | t:{ value: dueDatePreview } }}
       </div>
     </div>
 
@@ -131,7 +168,7 @@
 
       <div class="field col-2">
         <label class="label">{{ 'form.notes' | t }}</label>
-        <textarea class="textarea" rows="3" formControlName="notes"></textarea>
+        <textarea class="textarea" rows="4" formControlName="notes"></textarea>
       </div>
     </ng-container>
 

@@ -14,7 +14,6 @@ export interface TaskItem {
   dueDate: string;
 
   importance: number;
-
   urgencyFeeling: number;
 
   effortMinutes: number;
@@ -26,6 +25,7 @@ export interface TaskItem {
   category?: Category;
 
   isDone: boolean;
+  doneAt?: string;
 
   createdAt: string;
   updatedAt: string;

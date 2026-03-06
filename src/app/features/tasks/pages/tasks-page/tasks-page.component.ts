@@ -1,52 +1,143 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, shareReplay, take } from 'rxjs';
-
-import { RankedTask, TaskItem } from '../../../../models/task.model';
-import { PriorityService } from '../../services/priority.service';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { combineLatest, map } from 'rxjs';
 
 import { TASKS_REPOSITORY } from '../../../../core/repositories/tasks-repository.token';
 import { TasksRepository } from '../../../../core/repositories/tasks-repository';
-
-import { TaskFormComponent, CreateTaskPayload, UpdateTaskPayload } from '../../components/task-form/task-form.component';
+import {
+  RankedTask,
+  Quadrant,
+  TaskItem,
+  Category,
+  EnergyLevel,
+  CommitmentLevel,
+  PenaltyLevel,
+} from '../../../../models/task.model';
+import { TaskFilter } from '../../models/task-filter.model';
+import { TaskSort } from '../../models/task-sort.model';
+import {
+  CreateTaskPayload,
+  TaskFormComponent,
+  UpdateTaskPayload,
+} from '../../components/task-form/task-form.component';
 import { FiltersComponent } from '../../components/filters/filters.component';
 import { MatrixComponent } from '../../components/matrix/matrix.component';
 import { PriorityListComponent } from '../../components/priority-list/priority-list.component';
-
-import { TaskFilter } from '../../models/task-filter.model';
 import { TPipe } from '../../../../core/i18n/t.pipe';
+import { I18nService } from '../../../../core/i18n/i18n.service';
+
+interface BackupFile {
+  version: number;
+  exportedAt: string;
+  tasks: TaskItem[];
+}
 
 @Component({
   selector: 'app-tasks-page',
   standalone: true,
-  imports: [CommonModule, TaskFormComponent, FiltersComponent, MatrixComponent, PriorityListComponent, TPipe],
+  imports: [
+    CommonModule,
+    TPipe,
+    FiltersComponent,
+    MatrixComponent,
+    PriorityListComponent,
+    TaskFormComponent,
+  ],
   templateUrl: './tasks-page.component.html',
   styleUrl: './tasks-page.component.css',
 })
 export class TasksPageComponent {
-  private readonly repo: TasksRepository = inject(TASKS_REPOSITORY);
-  private readonly priority = inject(PriorityService);
+  private readonly repo = inject(TASKS_REPOSITORY) as TasksRepository;
+  readonly i18n = inject(I18nService);
 
-  activeFilter: TaskFilter = 'today';
-  private readonly activeFilter$ = new BehaviorSubject<TaskFilter>(this.activeFilter);
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
-  private readonly editingId$ = new BehaviorSubject<string | null>(null);
+  filter: TaskFilter = 'today';
+  sort: TaskSort = 'priorityDesc';
+  search = '';
+  selectedDate = this.dateOnly(new Date());
 
-  readonly tasks$ = this.repo.tasks$.pipe(shareReplay({ bufferSize: 1, refCount: true }));
+  isFormOpen = false;
+  editingId: string | null = null;
+  deleteId: string | null = null;
+  flashKey: string | null = null;
 
-  readonly ranked$ = combineLatest([this.tasks$, this.activeFilter$]).pipe(
-    map(([tasks, filter]) => this.priority.toRanked(this.applyFilter(tasks, filter)))
+  readonly tasks$ = this.repo.tasks$;
+
+  readonly vm$ = combineLatest([this.tasks$, this.i18n.lang$]).pipe(
+    map(([tasks]) => {
+      const ranked = tasks.map((task) => this.rankTask(task));
+      const filtered = ranked.filter((x) => this.matchesFilter(x.task) && this.matchesSearch(x.task));
+      const sorted = [...filtered].sort((a, b) => this.compareRanked(a, b));
+      const editingTask = this.editingId ? tasks.find((x) => x.id === this.editingId) ?? null : null;
+      const deleteTask = this.deleteId ? tasks.find((x) => x.id === this.deleteId) ?? null : null;
+
+      return {
+        allTasks: tasks,
+        items: sorted,
+        editingTask,
+        deleteTask,
+      };
+    })
   );
 
-  readonly editingTask$ = combineLatest([this.tasks$, this.editingId$]).pipe(
-    map(([tasks, id]) => (id ? tasks.find((t) => t.id === id) ?? null : null))
-  );
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: Event): void {
+    if (this.deleteId) {
+      event.preventDefault();
+      this.deleteId = null;
+      return;
+    }
 
-  onCreateTask(payload: CreateTaskPayload): void {
-    const nowIso = new Date().toISOString();
+    if (this.isFormOpen) {
+      event.preventDefault();
+      this.closeForm();
+    }
+  }
 
+  openCreate(): void {
+    this.flashKey = null;
+    this.editingId = null;
+    this.isFormOpen = true;
+  }
+
+  openEdit(id: string): void {
+    this.flashKey = null;
+    this.editingId = id;
+    this.isFormOpen = true;
+  }
+
+  closeForm(): void {
+    this.isFormOpen = false;
+    this.editingId = null;
+  }
+
+  requestDelete(id: string): void {
+    this.deleteId = id;
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteId) return;
+    this.repo.delete(this.deleteId);
+    this.deleteId = null;
+  }
+
+  toggleDone(taskId: string, tasks: TaskItem[]): void {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task) return;
+    this.repo.setDone(taskId, !task.isDone);
+  }
+
+  createTask(payload: CreateTaskPayload): void {
+    const now = new Date().toISOString();
     const task: TaskItem = {
-      id: this.newId(),
+      id: this.makeId(),
       title: payload.title,
       notes: payload.notes,
       dueDate: payload.dueDate,
@@ -58,100 +149,301 @@ export class TasksPageComponent {
       penalty: payload.penalty,
       category: payload.category,
       isDone: false,
-      createdAt: nowIso,
-      updatedAt: nowIso,
+      doneAt: undefined,
+      createdAt: now,
+      updatedAt: now,
     };
 
     this.repo.add(task);
+    this.closeForm();
   }
 
-  onUpdateTask(p: UpdateTaskPayload): void {
-    this.repo.update(p.id, p.patch);
-    this.closeEdit();
+  updateTask(payload: UpdateTaskPayload): void {
+    this.repo.update(payload.id, payload.patch);
+    this.closeForm();
   }
 
-  onFilterChange(f: TaskFilter): void {
-    this.activeFilter = f;
-    this.activeFilter$.next(f);
+  setFilter(filter: TaskFilter): void {
+    this.filter = filter;
   }
 
-  onToggleDone(id: string): void {
-    this.tasks$.pipe(take(1)).subscribe((tasks) => {
-      const t = tasks.find((x) => x.id === id);
-      if (t) this.repo.setDone(id, !t.isDone);
-    });
+  setSort(sort: TaskSort): void {
+    this.sort = sort;
   }
 
-  onDeleteTask(id: string): void {
-    this.repo.delete(id);
-    if (this.editingId$.value === id) this.closeEdit();
+  setSearch(search: string): void {
+    this.search = search;
   }
 
-  startEdit(id: string): void {
-    this.editingId$.next(id);
+  setSelectedDate(date: string): void {
+    this.selectedDate = date || this.selectedDate;
+    if (date) this.filter = 'date';
   }
 
-  closeEdit(): void {
-    this.editingId$.next(null);
-  }
-
-  private applyFilter(all: TaskItem[], filter: TaskFilter): TaskItem[] {
-    const today = this.dateOnly(new Date());
-    const todayStr = this.toDateOnlyString(today);
-
-    const tomorrow = this.addDays(today, 1);
-    const tomorrowStr = this.toDateOnlyString(tomorrow);
-
-    const weekEnd = this.addDays(today, 7);
-
-    const isDateInRange = (dateStr: string, from: Date, to: Date): boolean => {
-      const d = this.parseDateOnly(dateStr);
-      return d.getTime() >= from.getTime() && d.getTime() <= to.getTime();
+  exportJson(tasks: TaskItem[]): void {
+    const payload: BackupFile = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      tasks: [...tasks].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
     };
 
-    switch (filter) {
-      case 'done':
-        return all.filter((t) => t.isDone);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
 
-      case 'all':
-        return all.filter((t) => !t.isDone);
+    a.href = url;
+    a.download = `${this.i18n.t('backup.export.filename')}-${stamp}.json`;
+    a.click();
 
-      case 'today':
-        return all.filter((t) => !t.isDone && t.dueDate === todayStr);
+    URL.revokeObjectURL(url);
+  }
 
-      case 'tomorrow':
-        return all.filter((t) => !t.isDone && t.dueDate === tomorrowStr);
+  triggerImport(): void {
+    this.fileInput?.nativeElement.click();
+  }
 
-      case 'week':
-        return all.filter((t) => !t.isDone && isDateInRange(t.dueDate, today, weekEnd));
+  async onImportFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file) return;
+
+    try {
+      const raw = await file.text();
+      const parsed = JSON.parse(raw) as Partial<BackupFile> | TaskItem[];
+      const tasks = this.extractTasksFromBackup(parsed);
+      await this.repo.upsertMany(tasks);
+      this.flashKey = 'tasks.import.success';
+    } catch (e) {
+      console.error(e);
+      this.flashKey = 'tasks.import.error';
     }
   }
 
-  private newId(): string {
-    const anyCrypto = crypto as unknown as { randomUUID?: () => string };
-    if (anyCrypto?.randomUUID) return anyCrypto.randomUUID();
-    return 't_' + Math.random().toString(16).slice(2) + '_' + Date.now().toString(16);
+  private extractTasksFromBackup(source: Partial<BackupFile> | TaskItem[]): TaskItem[] {
+    if (Array.isArray(source)) {
+      return source
+        .map((x) => this.normalizeImportedTask(x))
+        .filter((x): x is TaskItem => !!x);
+    }
+
+    if (source.version !== 1 || !Array.isArray(source.tasks)) {
+      throw new Error(this.i18n.t('backup.invalid'));
+    }
+
+    return source.tasks
+      .map((x) => this.normalizeImportedTask(x))
+      .filter((x): x is TaskItem => !!x);
   }
 
-  private parseDateOnly(s: string): Date {
-    const [y, m, d] = s.split('-').map((x) => Number(x));
-    return new Date(y, (m || 1) - 1, d || 1);
+  private normalizeImportedTask(input: Partial<TaskItem> | null | undefined): TaskItem | null {
+    if (!input) return null;
+
+    const title = String(input.title ?? '').trim();
+    const dueDate = this.normalizeDateOnly(String(input.dueDate ?? ''));
+    if (title.length < 2 || !dueDate) return null;
+
+    const createdAt = this.normalizeIso(input.createdAt) ?? new Date().toISOString();
+    const updatedAt = this.normalizeIso(input.updatedAt) ?? createdAt;
+    const isDone = !!input.isDone;
+    const doneAt = isDone ? this.normalizeIso(input.doneAt) ?? updatedAt : undefined;
+
+    return {
+      id: String(input.id ?? this.makeId()),
+      title,
+      notes: String(input.notes ?? '').trim() || undefined,
+      dueDate,
+      importance: this.clamp(Number(input.importance ?? 50), 0, 100),
+      urgencyFeeling: this.clamp(Number(input.urgencyFeeling ?? 50), 0, 100),
+      effortMinutes: Math.max(1, Math.round(Number(input.effortMinutes ?? 30))),
+      energy: this.oneOf<EnergyLevel>(input.energy, ['low', 'medium', 'high'], 'medium'),
+      commitment: this.oneOf<CommitmentLevel>(input.commitment, ['none', 'soft', 'hard'], 'none'),
+      penalty: this.oneOf<PenaltyLevel>(input.penalty, ['low', 'medium', 'high'], 'medium'),
+      category: this.oneOf<Category | undefined>(input.category, ['work', 'home', 'health', 'people', 'self'], undefined),
+      isDone,
+      doneAt,
+      createdAt,
+      updatedAt,
+    };
   }
 
-  private dateOnly(d: Date): Date {
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  private rankTask(task: TaskItem): RankedTask {
+    const impact = this.scoreImpact(task);
+    const deadline = this.scoreDeadline(task);
+    const aging = this.scoreAging(task);
+
+    const score =
+      impact * 0.42 +
+      deadline * 0.33 +
+      aging * 0.07 +
+      task.importance * 0.12 +
+      task.urgencyFeeling * 0.06;
+
+    return {
+      task,
+      score: Math.round(score),
+      quadrant: this.getQuadrant(task.importance, task.urgencyFeeling),
+      impact,
+      deadline,
+      aging,
+    };
   }
 
-  private addDays(d: Date, days: number): Date {
-    const x = new Date(d.getTime());
-    x.setDate(x.getDate() + days);
-    return x;
+  private scoreImpact(task: TaskItem): number {
+    const energyMap: Record<EnergyLevel, number> = { low: 6, medium: 3, high: 0 };
+    const commitmentMap: Record<CommitmentLevel, number> = { none: 0, soft: 6, hard: 12 };
+    const penaltyMap: Record<PenaltyLevel, number> = { low: 4, medium: 10, high: 18 };
+    const categoryMap: Partial<Record<Category, number>> = { work: 10, health: 11, home: 6, people: 7, self: 5 };
+
+    const effortPenalty = Math.min(18, Math.round(task.effortMinutes / 18));
+
+    return this.clamp(
+      task.importance +
+      commitmentMap[task.commitment] +
+      penaltyMap[task.penalty] +
+      (task.category ? categoryMap[task.category] ?? 0 : 0) -
+      effortPenalty -
+      energyMap[task.energy],
+      0,
+      100
+    );
   }
 
-  private toDateOnlyString(d: Date): string {
+  private scoreDeadline(task: TaskItem): number {
+    const today = this.startOfToday();
+    const due = this.fromDateOnly(task.dueDate);
+    const diffDays = Math.floor((due.getTime() - today.getTime()) / 86400000);
+
+    if (diffDays < 0) return 100;
+    if (diffDays === 0) return 96;
+    if (diffDays === 1) return 86;
+    if (diffDays <= 3) return 72;
+    if (diffDays <= 7) return 58;
+    if (diffDays <= 14) return 42;
+    if (diffDays <= 30) return 26;
+    return 14;
+  }
+
+  private scoreAging(task: TaskItem): number {
+    const created = new Date(task.createdAt);
+    const days = Math.max(0, Math.floor((Date.now() - created.getTime()) / 86400000));
+    return this.clamp(days * 2, 0, 30);
+  }
+
+  private getQuadrant(importance: number, urgency: number): Quadrant {
+    if (urgency >= 50 && importance >= 50) return 'Q1';
+    if (urgency < 50 && importance >= 50) return 'Q2';
+    if (urgency >= 50 && importance < 50) return 'Q3';
+    return 'Q4';
+  }
+
+  private matchesFilter(task: TaskItem): boolean {
+    const today = this.startOfToday();
+    const todayStr = this.dateOnly(today);
+    const tomorrowStr = this.dateOnly(this.addDays(today, 1));
+    const due = task.dueDate;
+
+    if (this.filter === 'done') return task.isDone;
+    if (task.isDone) return false;
+
+    switch (this.filter) {
+      case 'today':
+        return due === todayStr;
+      case 'tomorrow':
+        return due === tomorrowStr;
+      case 'week': {
+        const dueDate = this.fromDateOnly(due);
+        const weekEnd = this.addDays(today, 6);
+        return dueDate >= today && dueDate <= weekEnd;
+      }
+      case 'overdue':
+        return due < todayStr;
+      case 'date':
+        return due === this.selectedDate;
+      case 'all':
+      default:
+        return true;
+    }
+  }
+
+  private matchesSearch(task: TaskItem): boolean {
+    const query = this.search.trim().toLowerCase();
+    if (!query) return true;
+
+    const hay = `${task.title} ${task.notes ?? ''}`.toLowerCase();
+    return hay.includes(query);
+  }
+
+  private compareRanked(a: RankedTask, b: RankedTask): number {
+    switch (this.sort) {
+      case 'dueDateAsc':
+        return a.task.dueDate.localeCompare(b.task.dueDate) || b.score - a.score;
+      case 'dueDateDesc':
+        return b.task.dueDate.localeCompare(a.task.dueDate) || b.score - a.score;
+      case 'createdAtDesc':
+        return b.task.createdAt.localeCompare(a.task.createdAt) || b.score - a.score;
+      case 'updatedAtDesc':
+        return b.task.updatedAt.localeCompare(a.task.updatedAt) || b.score - a.score;
+      case 'doneAtDesc':
+        return (b.task.doneAt ?? '').localeCompare(a.task.doneAt ?? '') || b.score - a.score;
+      case 'doneAtAsc':
+        return (a.task.doneAt ?? '').localeCompare(b.task.doneAt ?? '') || b.score - a.score;
+      case 'titleAsc':
+        return a.task.title.localeCompare(b.task.title, this.i18n.lang) || b.score - a.score;
+      case 'priorityDesc':
+      default:
+        return b.score - a.score || a.task.dueDate.localeCompare(b.task.dueDate);
+    }
+  }
+
+  private normalizeDateOnly(value: string): string | null {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    return value;
+  }
+
+  private normalizeIso(value: unknown): string | undefined {
+    if (!value) return undefined;
+    const d = new Date(String(value));
+    return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+  }
+
+  private dateOnly(d: Date): string {
     const yyyy = String(d.getFullYear());
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private fromDateOnly(value: string): Date {
+    const [yyyy, mm, dd] = value.split('-').map(Number);
+    return new Date(yyyy, (mm || 1) - 1, dd || 1);
+  }
+
+  private startOfToday(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  private addDays(date: Date, days: number): Date {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    if (!Number.isFinite(value)) return min;
+    return Math.max(min, Math.min(max, Math.round(value)));
+  }
+
+  private oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
+    return allowed.includes(value as T) ? (value as T) : fallback;
+  }
+
+  private makeId(): string {
+    const random = globalThis.crypto?.randomUUID?.();
+    if (random) return random;
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   }
 }

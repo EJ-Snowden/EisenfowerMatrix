@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  OnChanges,
+  SimpleChanges,
+  HostListener,
+} from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 
 import {
@@ -11,6 +20,7 @@ import {
 } from '../../../../models/task.model';
 
 import { TPipe } from '../../../../core/i18n/t.pipe';
+import { I18nService } from '../../../../core/i18n/i18n.service';
 
 export interface CreateTaskPayload {
   title: string;
@@ -31,6 +41,7 @@ export interface UpdateTaskPayload {
 }
 
 type IntControlName = 'importance' | 'urgencyFeeling';
+type PresetName = 'work' | 'home' | 'health';
 
 @Component({
   selector: 'app-task-form',
@@ -47,6 +58,7 @@ export class TaskFormComponent implements OnChanges {
   @Output() cancelEdit = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly i18n = inject(I18nService);
 
   isAdvanced = false;
 
@@ -56,6 +68,7 @@ export class TaskFormComponent implements OnChanges {
   readonly commitmentOptions: CommitmentLevel[] = ['none', 'soft', 'hard'];
   readonly penaltyOptions: PenaltyLevel[] = ['low', 'medium', 'high'];
   readonly categoryOptions: Category[] = ['work', 'home', 'health', 'people', 'self'];
+  readonly presetOptions: PresetName[] = ['work', 'home', 'health'];
 
   form = this.fb.group({
     title: this.fb.control('', [Validators.required, Validators.minLength(2)]),
@@ -77,7 +90,10 @@ export class TaskFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['editTask']) {
       const t = this.editTask;
-      if (!t) return;
+      if (!t) {
+        this.resetForm();
+        return;
+      }
 
       this.isAdvanced = true;
 
@@ -96,8 +112,67 @@ export class TaskFormComponent implements OnChanges {
     }
   }
 
+  @HostListener('keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    const tag = target?.tagName?.toLowerCase() ?? '';
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.clear();
+      return;
+    }
+
+    if (event.key === 'Enter' && tag !== 'textarea') {
+      event.preventDefault();
+      this.submit();
+    }
+  }
+
   toggleAdvanced(): void {
     this.isAdvanced = !this.isAdvanced;
+  }
+
+  applyPreset(name: PresetName): void {
+    this.isAdvanced = true;
+
+    switch (name) {
+      case 'work':
+        this.form.patchValue({
+          category: 'work',
+          effortMinutes: 60,
+          energy: 'high',
+          commitment: 'hard',
+          penalty: 'high',
+          importance: 78,
+          urgencyFeeling: 70,
+        });
+        break;
+
+      case 'home':
+        this.form.patchValue({
+          category: 'home',
+          effortMinutes: 30,
+          energy: 'medium',
+          commitment: 'soft',
+          penalty: 'medium',
+          importance: 55,
+          urgencyFeeling: 52,
+        });
+        break;
+
+      case 'health':
+        this.form.patchValue({
+          category: 'health',
+          effortMinutes: 30,
+          energy: 'medium',
+          commitment: 'hard',
+          penalty: 'high',
+          importance: 88,
+          urgencyFeeling: 64,
+        });
+        break;
+    }
   }
 
   setToday(): void {
@@ -105,8 +180,22 @@ export class TaskFormComponent implements OnChanges {
   }
 
   setTomorrow(): void {
+    this.setInDays(1);
+  }
+
+  setInDays(days: number): void {
     const d = new Date();
-    d.setDate(d.getDate() + 1);
+    d.setDate(d.getDate() + days);
+    this.form.controls.dueDate.setValue(this.toDateOnlyString(d));
+  }
+
+  setNextWeek(): void {
+    this.setInDays(7);
+  }
+
+  setNextMonth(): void {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
     this.form.controls.dueDate.setValue(this.toDateOnlyString(d));
   }
 
@@ -125,10 +214,6 @@ export class TaskFormComponent implements OnChanges {
 
     this.form.controls[controlName].setValue(clamped);
     el.value = String(clamped);
-  }
-
-  private clampInt(v: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, v));
   }
 
   submit(): void {
@@ -172,19 +257,7 @@ export class TaskFormComponent implements OnChanges {
     }
 
     this.createTask.emit(common);
-
-    this.form.reset({
-      title: '',
-      dueDate: this.todayDateOnly(),
-      importance: 50,
-      urgencyFeeling: 50,
-      effortMinutes: 30,
-      energy: 'medium',
-      commitment: 'none',
-      penalty: 'medium',
-      category: '',
-      notes: '',
-    });
+    this.resetForm();
   }
 
   clear(): void {
@@ -193,6 +266,32 @@ export class TaskFormComponent implements OnChanges {
       return;
     }
 
+    this.resetForm();
+  }
+
+  close(): void {
+    this.cancelEdit.emit();
+  }
+
+  get titleInvalid(): boolean {
+    const c = this.form.controls.title;
+    return c.touched && c.invalid;
+  }
+
+  get dueDatePreview(): string {
+    const value = this.form.controls.dueDate.value;
+    if (!value) return '';
+
+    const date = this.fromDateOnlyString(value);
+    return new Intl.DateTimeFormat(this.i18n.lang === 'ru' ? 'ru-RU' : 'en-US', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
+  }
+
+  private resetForm(): void {
     this.form.reset({
       title: '',
       dueDate: this.todayDateOnly(),
@@ -207,9 +306,8 @@ export class TaskFormComponent implements OnChanges {
     });
   }
 
-  get titleInvalid(): boolean {
-    const c = this.form.controls.title;
-    return c.touched && c.invalid;
+  private clampInt(v: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, v));
   }
 
   private todayDateOnly(): string {
@@ -221,5 +319,10 @@ export class TaskFormComponent implements OnChanges {
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private fromDateOnlyString(value: string): Date {
+    const [yyyy, mm, dd] = value.split('-').map(Number);
+    return new Date(yyyy, (mm || 1) - 1, dd || 1);
   }
 }

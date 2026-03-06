@@ -37,19 +37,40 @@ const DICT: Record<Lang, Record<string, string>> = {
     'filters.today': 'Today',
     'filters.tomorrow': 'Tomorrow',
     'filters.week': 'Week',
+    'filters.overdue': 'Overdue',
+    'filters.date': 'Date',
     'filters.all': 'All',
     'filters.done': 'Done',
+    'filters.search': 'Search',
+    'filters.search.placeholder': 'Search title or notes',
+    'filters.pickDate': 'Pick date',
+    'filters.sort': 'Sort',
+    'filters.sort.priorityDesc': 'Priority - high to low',
+    'filters.sort.dueDateAsc': 'Due date - nearest first',
+    'filters.sort.dueDateDesc': 'Due date - latest first',
+    'filters.sort.createdAtDesc': 'Created - newest first',
+    'filters.sort.updatedAtDesc': 'Updated - newest first',
+    'filters.sort.doneAtDesc': 'Completed - newest first',
+    'filters.sort.doneAtAsc': 'Completed - oldest first',
+    'filters.sort.titleAsc': 'Title - A to Z',
 
     'tasks.title': 'Tasks',
     'tasks.subtitle': 'Matrix + priority score',
     'tasks.create.title': 'Create',
     'tasks.create.hint': 'Simple or Advanced',
     'tasks.edit.title': 'Edit',
+    'tasks.openCreate': 'New task',
+    'tasks.import.success': 'Backup imported successfully',
+    'tasks.import.error': 'Import failed. Check JSON format.',
 
     'actions.edit': 'Edit',
     'actions.delete': 'Delete',
     'actions.done': 'Done',
     'actions.undone': 'Undone',
+    'actions.export': 'Export JSON',
+    'actions.import': 'Import JSON',
+    'actions.confirm': 'Confirm',
+    'actions.create': 'Create',
 
     'matrix.title': 'Eisenhower Matrix',
     'matrix.count': '{count} tasks',
@@ -66,15 +87,23 @@ const DICT: Record<Lang, Record<string, string>> = {
     'matrix.tooltip.i': 'I {i}',
     'matrix.tooltip.u': 'U {u}',
     'matrix.tooltip.effort': '{m}m',
+    'matrix.doneAt': 'Done',
 
     'plist.title': 'Priority list',
     'plist.count': '{count} items',
     'plist.empty': 'No tasks for this filter.',
+    'plist.doneAt': 'Done',
 
     'form.add': 'Add task',
     'form.edit': 'Edit task',
     'form.simple': 'Simple',
     'form.advanced': 'Advanced',
+    'form.hotkeys': 'Enter submit, Esc close',
+
+    'form.presets': 'Presets',
+    'form.preset.work': 'Work',
+    'form.preset.home': 'Home',
+    'form.preset.health': 'Health',
 
     'form.title': 'Title',
     'form.title.placeholder': 'What to do?',
@@ -83,12 +112,15 @@ const DICT: Record<Lang, Record<string, string>> = {
     'form.duedate': 'Due date',
     'form.today': 'Today',
     'form.tomorrow': 'Tomorrow',
+    'form.plus3': '+3 days',
+    'form.nextWeek': 'Next week',
+    'form.nextMonth': 'Next month',
+    'form.datePreview': 'Selected: {value}',
 
     'form.importance': 'Importance: {v}',
     'form.urgency': 'Urgency feeling: {v}',
 
     'form.effort': 'Effort',
-    'form.energy': 'Energy',
     'form.commitment': 'Commitment',
     'form.penalty': 'Penalty',
     'form.category': 'Category',
@@ -117,6 +149,15 @@ const DICT: Record<Lang, Record<string, string>> = {
     'form.btn.save': 'Save',
     'form.btn.clear': 'Clear',
     'form.btn.cancel': 'Cancel',
+
+    'confirm.delete.title': 'Delete task?',
+    'confirm.delete.message': 'Are you sure you want to delete "{title}"?',
+    'confirm.delete.hint': 'This action cannot be undone.',
+
+    'backup.title': 'Backup',
+    'backup.export.filename': 'eisenhower-matrix-backup',
+    'backup.versionError': 'Unsupported backup version',
+    'backup.invalid': 'Invalid backup file',
   },
 
   ru: {
@@ -150,44 +191,55 @@ const DICT: Record<Lang, Record<string, string>> = {
     'filters.today': 'Сегодня',
     'filters.tomorrow': 'Завтра',
     'filters.week': 'Неделя',
+    'filters.overdue': 'Просрочено',
+    'filters.date': 'Дата',
     'filters.all': 'Все',
     'filters.done': 'Готово',
+    'filters.search': 'Поиск',
+    'filters.search.placeholder': 'Поиск по названию или заметкам',
+    'filters.pickDate': 'Выбрать дату',
+    'filters.sort': 'Сортировка',
+    'filters.sort.priorityDesc': 'Приоритет - от высокого к низкому',
+    'filters.sort.dueDateAsc': 'Срок - ближайшие сначала',
+    'filters.sort.dueDateDesc': 'Срок - поздние сначала',
+    'filters.sort.createdAtDesc': 'Создано - новые сначала',
+    'filters.sort.updatedAtDesc': 'Обновлено - новые сначала',
+    'filters.sort.doneAtDesc': 'Завершено - новые сначала',
+    'filters.sort.doneAtAsc': 'Завершено - старые сначала',
+    'filters.sort.titleAsc': 'Название - А-Я',
 
     'tasks.title': 'Задачи',
     'tasks.subtitle': 'Матрица + приоритет',
     'tasks.create.title': 'Добавить',
     'tasks.create.hint': 'Простой или расширенный режим',
     'tasks.edit.title': 'Редактирование',
+    'tasks.openCreate': 'Новая задача',
+    'tasks.import.success': 'Резервная копия импортирована',
+    'tasks.import.error': 'Импорт не удался. Проверь JSON.',
 
-    'actions.edit': 'Изменить',
-    'actions.delete': 'Удалить',
-    'actions.done': 'Готово',
-    'actions.undone': 'Вернуть',
 
-    'matrix.title': 'Матрица Эйзенхауэра',
-    'matrix.count': '{count} задач',
-    'matrix.view.quadrants': 'Квадранты',
-    'matrix.view.plot': 'График',
-    'matrix.hint': 'Линии квадрантов на 50/50. Клик по точке - редактирование.',
-    'matrix.axis.urgency': 'Срочность',
-    'matrix.axis.importance': 'Важность',
-    'matrix.empty': 'Пусто',
-    'matrix.q1': 'Q1 - Срочно и важно',
-    'matrix.q2': 'Q2 - Не срочно и важно',
     'matrix.q3': 'Q3 - Срочно и не важно',
     'matrix.q4': 'Q4 - Не срочно и не важно',
     'matrix.tooltip.i': 'В {i}',
     'matrix.tooltip.u': 'С {u}',
     'matrix.tooltip.effort': '{m}м',
+    'matrix.doneAt': 'Готово',
 
     'plist.title': 'Список приоритетов',
     'plist.count': '{count} задач',
     'plist.empty': 'Нет задач для этого фильтра.',
+    'plist.doneAt': 'Готово',
 
     'form.add': 'Добавить задачу',
     'form.edit': 'Редактировать задачу',
     'form.simple': 'Просто',
     'form.advanced': 'Расширенно',
+    'form.hotkeys': 'Enter отправить, Esc закрыть',
+
+    'form.presets': 'Пресеты',
+    'form.preset.work': 'Работа',
+    'form.preset.home': 'Дом',
+    'form.preset.health': 'Здоровье',
 
     'form.title': 'Название',
     'form.title.placeholder': 'Что нужно сделать?',
@@ -196,6 +248,10 @@ const DICT: Record<Lang, Record<string, string>> = {
     'form.duedate': 'Дата',
     'form.today': 'Сегодня',
     'form.tomorrow': 'Завтра',
+    'form.plus3': '+3 дня',
+    'form.nextWeek': 'Следующая неделя',
+    'form.nextMonth': 'Следующий месяц',
+    'form.datePreview': 'Выбрано: {value}',
 
     'form.importance': 'Важность: {v}',
     'form.urgency': 'Срочность: {v}',
@@ -220,6 +276,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     'penalty.medium': 'Средний',
     'penalty.high': 'Высокий',
 
+
     'category.work': 'Работа',
     'category.home': 'Дом',
     'category.health': 'Здоровье',
@@ -230,6 +287,15 @@ const DICT: Record<Lang, Record<string, string>> = {
     'form.btn.save': 'Сохранить',
     'form.btn.clear': 'Очистить',
     'form.btn.cancel': 'Отмена',
+
+    'confirm.delete.title': 'Удалить задачу?',
+    'confirm.delete.message': 'Вы уверены, что хотите удалить "{title}"?',
+    'confirm.delete.hint': 'Это действие нельзя отменить.',
+
+    'backup.title': 'Резервная копия',
+    'backup.export.filename': 'eisenhower-matrix-backup',
+    'backup.versionError': 'Неподдерживаемая версия файла',
+    'backup.invalid': 'Некорректный файл резервной копии',
   },
 };
 
@@ -238,6 +304,10 @@ export class I18nService {
   private readonly langSubject = new BehaviorSubject<Lang>(this.detectInitialLang());
   readonly lang$ = this.langSubject.asObservable();
 
+  constructor() {
+    this.applyDocumentLang(this.langSubject.value);
+  }
+
   get lang(): Lang {
     return this.langSubject.value;
   }
@@ -245,6 +315,7 @@ export class I18nService {
   setLang(lang: Lang): void {
     if (lang === this.lang) return;
     this.langSubject.next(lang);
+    this.applyDocumentLang(lang);
     try {
       localStorage.setItem(STORAGE_KEY, lang);
     } catch {}
@@ -275,5 +346,11 @@ export class I18nService {
 
     const nav = (typeof navigator !== 'undefined' ? navigator.language : 'en').toLowerCase();
     return nav.startsWith('ru') ? 'ru' : 'en';
+  }
+
+  private applyDocumentLang(lang: Lang): void {
+    try {
+      document.documentElement.lang = lang;
+    } catch {}
   }
 }

@@ -8,4 +8,6 @@ export interface TasksRepository {
   update(id: string, patch: Partial<TaskItem>): void;
   setDone(id: string, isDone: boolean): void;
   delete(id: string): void;
+
+  upsertMany(tasks: TaskItem[]): Promise<void>;
 }

@@ -32,8 +32,11 @@
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
-              <span class="pill">{{ x.task.energy }}</span>
-              <span class="pill">{{ x.task.penalty }}</span>
+              <span class="pill">{{ ('energy.' + x.task.energy) | t }}</span>
+              <span class="pill">{{ ('penalty.' + x.task.penalty) | t }}</span>
+              <span class="pill" *ngIf="x.task.isDone && x.task.doneAt">
+                {{ 'matrix.doneAt' | t }}: {{ x.task.doneAt | date: 'short' }}
+              </span>
             </div>
             <div class="actions">
               <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
@@ -46,6 +49,7 @@
         </div>
         <ng-template #empty1><div class="empty">{{ 'matrix.empty' | t }}</div></ng-template>
       </div>
+
 
       <div class="cell q2">
         <div class="cell-title">
@@ -62,8 +66,11 @@
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
-              <span class="pill">{{ x.task.energy }}</span>
-              <span class="pill">{{ x.task.penalty }}</span>
+              <span class="pill">{{ ('energy.' + x.task.energy) | t }}</span>
+              <span class="pill">{{ ('penalty.' + x.task.penalty) | t }}</span>
+              <span class="pill" *ngIf="x.task.isDone && x.task.doneAt">
+                {{ 'matrix.doneAt' | t }}: {{ x.task.doneAt | date: 'short' }}
+              </span>
             </div>
             <div class="actions">
               <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
@@ -92,8 +99,11 @@
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
-              <span class="pill">{{ x.task.energy }}</span>
-              <span class="pill">{{ x.task.penalty }}</span>
+              <span class="pill">{{ ('energy.' + x.task.energy) | t }}</span>
+              <span class="pill">{{ ('penalty.' + x.task.penalty) | t }}</span>
+              <span class="pill" *ngIf="x.task.isDone && x.task.doneAt">
+                {{ 'matrix.doneAt' | t }}: {{ x.task.doneAt | date: 'short' }}
+              </span>
             </div>
             <div class="actions">
               <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
@@ -122,8 +132,11 @@
             <div class="meta">
               <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
               <span class="pill">{{ x.task.effortMinutes }}m</span>
-              <span class="pill">{{ x.task.energy }}</span>
-              <span class="pill">{{ x.task.penalty }}</span>
+              <span class="pill">{{ ('energy.' + x.task.energy) | t }}</span>
+              <span class="pill">{{ ('penalty.' + x.task.penalty) | t }}</span>
+              <span class="pill" *ngIf="x.task.isDone && x.task.doneAt">
+                {{ 'matrix.doneAt' | t }}: {{ x.task.doneAt | date: 'short' }}
+              </span>
             </div>
             <div class="actions">
               <button type="button" class="btn btn-xs btn-ghost" (click)="onEdit(x.task.id)">{{ 'actions.edit' | t }}</button>
@@ -155,7 +168,6 @@
         (mouseenter)="enterDot(x)"
         (mouseleave)="leaveDot()"
         (click)="onEdit(x.task.id)"
-        title="Click to edit"
       ></div>
 
       <div class="tooltip" *ngIf="hovered" [style.left.px]="mouseX + 12" [style.top.px]="mouseY + 12">

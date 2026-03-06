@@ -8,12 +8,14 @@
   border-radius: 16px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.02);
-  transition: transform 160ms ease, border-color 160ms ease;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  animation: listEnter 220ms ease;
 }
 
 .pitem:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.01);
   border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
 }
 
 .pitem.done {
@@ -56,4 +58,15 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+@keyframes listEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -11,6 +11,9 @@
           <span class="pill pill-accent">{{ x.quadrant }}</span>
           <span class="pill">{{ x.score | number: '1.0-0' }}</span>
           <span class="pill" [class.pill-danger]="x.deadline > 1 && !x.task.isDone">{{ x.task.dueDate }}</span>
+          <span class="pill" *ngIf="x.task.isDone && x.task.doneAt">
+            {{ 'plist.doneAt' | t }}: {{ x.task.doneAt | date: 'short' }}
+          </span>
         </div>
 
         <div class="right">
@@ -29,9 +32,9 @@
 
       <div class="meta">
         <span class="pill">{{ x.task.effortMinutes }}m</span>
-        <span class="pill">{{ x.task.energy }}</span>
-        <span class="pill">{{ x.task.commitment }}</span>
-        <span class="pill">{{ x.task.penalty }}</span>
+        <span class="pill">{{ ('energy.' + x.task.energy) | t }}</span>
+        <span class="pill">{{ ('commitment.' + x.task.commitment) | t }}</span>
+        <span class="pill">{{ ('penalty.' + x.task.penalty) | t }}</span>
       </div>
     </div>
   </div>

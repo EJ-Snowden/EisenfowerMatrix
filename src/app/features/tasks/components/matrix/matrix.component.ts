@@ -41,12 +41,10 @@ export class MatrixComponent implements OnChanges {
   }
 
   private rebuild(): void {
-    const byScoreDesc = (a: RankedTask, b: RankedTask) => b.score - a.score;
-
-    this.q1 = this.items.filter((x) => x.quadrant === 'Q1').sort(byScoreDesc);
-    this.q2 = this.items.filter((x) => x.quadrant === 'Q2').sort(byScoreDesc);
-    this.q3 = this.items.filter((x) => x.quadrant === 'Q3').sort(byScoreDesc);
-    this.q4 = this.items.filter((x) => x.quadrant === 'Q4').sort(byScoreDesc);
+    this.q1 = this.items.filter((x) => x.quadrant === 'Q1');
+    this.q2 = this.items.filter((x) => x.quadrant === 'Q2');
+    this.q3 = this.items.filter((x) => x.quadrant === 'Q3');
+    this.q4 = this.items.filter((x) => x.quadrant === 'Q4');
   }
 
   titleKeyOf(q: Quadrant): string {

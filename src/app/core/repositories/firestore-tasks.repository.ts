@@ -12,6 +12,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  writeBatch,
 } from '@angular/fire/firestore';
 
 @Injectable()
@@ -39,7 +40,7 @@ export class FirestoreTasksRepository implements TasksRepository {
     void this.runWithUid(async (uid) => {
       const ref = doc(this.firestore, `users/${uid}/tasks/${id}`);
       const nowIso = new Date().toISOString();
-      const clean = this.stripUndefined({ ...patch, updatedAt: nowIso } as any);
+      const clean = this.stripUndefined({ ...patch, updatedAt: nowIso } as Partial<TaskItem>);
       await updateDoc(ref, clean as any);
     });
   }
@@ -48,7 +49,14 @@ export class FirestoreTasksRepository implements TasksRepository {
     void this.runWithUid(async (uid) => {
       const ref = doc(this.firestore, `users/${uid}/tasks/${id}`);
       const nowIso = new Date().toISOString();
-      await updateDoc(ref, { isDone, updatedAt: nowIso } as any);
+      await updateDoc(
+        ref,
+        this.stripUndefined({
+          isDone,
+          doneAt: isDone ? nowIso : undefined,
+          updatedAt: nowIso,
+        }) as any
+      );
     });
   }
 
@@ -56,6 +64,24 @@ export class FirestoreTasksRepository implements TasksRepository {
     void this.runWithUid(async (uid) => {
       const ref = doc(this.firestore, `users/${uid}/tasks/${id}`);
       await deleteDoc(ref);
+    });
+  }
+
+  async upsertMany(tasks: TaskItem[]): Promise<void> {
+    await this.runWithUid(async (uid) => {
+      const chunkSize = 400;
+
+      for (let i = 0; i < tasks.length; i += chunkSize) {
+        const chunk = tasks.slice(i, i + chunkSize);
+        const batch = writeBatch(this.firestore);
+
+        for (const task of chunk) {
+          const ref = doc(this.firestore, `users/${uid}/tasks/${task.id}`);
+          batch.set(ref, this.stripUndefined(task) as any, { merge: false });
+        }
+
+        await batch.commit();
+      }
     });
   }
 
@@ -68,6 +94,7 @@ export class FirestoreTasksRepository implements TasksRepository {
       await fn(uid);
     } catch (e) {
       console.error(e);
+      throw e;
     }
   }
 

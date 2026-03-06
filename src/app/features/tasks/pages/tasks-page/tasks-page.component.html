@@ -1,60 +1,97 @@
-<section class="page">
-  <div class="head">
-    <div class="head-left">
+<section class="page" *ngIf="vm$ | async as vm">
+  <section class="card card-pad hero-card">
+    <div class="hero-copy">
       <h2 class="h2">{{ 'tasks.title' | t }}</h2>
-      <div class="muted2">{{ 'tasks.subtitle' | t }}</div>
+      <div class="muted">{{ 'tasks.subtitle' | t }}</div>
     </div>
 
-    <app-filters [active]="activeFilter" (filterChange)="onFilterChange($event)"></app-filters>
-  </div>
-
-  <div class="card card-pad">
-    <div class="card-head">
-      <h3 class="h3">{{ 'tasks.create.title' | t }}</h3>
-      <div class="muted">{{ 'tasks.create.hint' | t }}</div>
+    <div class="hero-actions">
+      <button type="button" class="btn btn-primary" (click)="openCreate()">
+        {{ 'tasks.openCreate' | t }}
+      </button>
     </div>
+  </section>
 
-    <app-task-form (createTask)="onCreateTask($event)"></app-task-form>
+  <app-filters
+    [active]="filter"
+    [search]="search"
+    [selectedDate]="selectedDate"
+    [sort]="sort"
+    (filterChange)="setFilter($event)"
+    (searchChange)="setSearch($event)"
+    (dateChange)="setSelectedDate($event)"
+    (sortChange)="setSort($event)"
+    (exportClick)="exportJson(vm.allTasks)"
+    (importClick)="triggerImport()"
+  />
+
+  <input
+    #fileInput
+    type="file"
+    hidden
+    accept="application/json,.json"
+    (change)="onImportFile($event)"
+  />
+
+  <div class="flash success" *ngIf="flashKey === 'tasks.import.success'">
+    {{ 'tasks.import.success' | t }}
   </div>
 
-  <ng-container *ngIf="ranked$ | async as ranked">
-    <div class="layout">
-      <app-matrix
-        class="left"
-        [items]="ranked"
-        (editTask)="startEdit($event)"
-        (toggleDone)="onToggleDone($event)"
-        (deleteTask)="onDeleteTask($event)"
-      ></app-matrix>
+  <div class="flash error" *ngIf="flashKey === 'tasks.import.error'">
+    {{ 'tasks.import.error' | t }}
+  </div>
 
-      <app-priority-list
-        class="right"
-        [items]="ranked"
-        (editTask)="startEdit($event)"
-        (toggleDone)="onToggleDone($event)"
-        (deleteTask)="onDeleteTask($event)"
-      ></app-priority-list>
+  <div class="content-grid">
+    <app-matrix
+      [items]="vm.items"
+      (editTask)="openEdit($event)"
+      (deleteTask)="requestDelete($event)"
+      (toggleDone)="toggleDone($event, vm.allTasks)"
+    />
+
+    <app-priority-list
+      [items]="vm.items"
+      (editTask)="openEdit($event)"
+      (deleteTask)="requestDelete($event)"
+      (toggleDone)="toggleDone($event, vm.allTasks)"
+    />
+  </div>
+
+  <button type="button" class="fab btn btn-primary" (click)="openCreate()">
+    +
+  </button>
+
+  <ng-container *ngIf="isFormOpen">
+    <div class="modal-backdrop" (click)="closeForm()"></div>
+    <div class="modal">
+      <div class="sheet card card-pad" (click)="$event.stopPropagation()">
+        <app-task-form
+          [editTask]="vm.editingTask"
+          (createTask)="createTask($event)"
+          (updateTask)="updateTask($event)"
+          (cancelEdit)="closeForm()"
+        />
+      </div>
     </div>
   </ng-container>
 
-  <ng-container *ngIf="editingTask$ | async as t">
-    <div class="modal-backdrop" *ngIf="t" (click)="closeEdit()"></div>
+  <ng-container *ngIf="vm.deleteTask as deleteTask">
+    <div class="modal-backdrop" (click)="deleteId = null"></div>
+    <div class="modal">
+      <section class="confirm card card-pad" (click)="$event.stopPropagation()">
+        <div class="confirm-title">{{ 'confirm.delete.title' | t }}</div>
+        <div class="confirm-text">{{ 'confirm.delete.message' | t:{ title: deleteTask.title } }}</div>
+        <div class="confirm-hint muted">{{ 'confirm.delete.hint' | t }}</div>
 
-    <div class="modal" *ngIf="t">
-      <div class="card card-pad modal-card">
-        <div class="card-head">
-          <h3 class="h3">{{ 'tasks.edit.title' | t }}</h3>
-          <button class="btn btn-ghost btn-xs" type="button" (click)="closeEdit()">
-            {{ 'app.close' | t }}
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-ghost" (click)="deleteId = null">
+            {{ 'form.btn.cancel' | t }}
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+            {{ 'actions.delete' | t }}
           </button>
         </div>
-
-        <app-task-form
-          [editTask]="t"
-          (updateTask)="onUpdateTask($event)"
-          (cancelEdit)="closeEdit()"
-        ></app-task-form>
-      </div>
+      </section>
     </div>
   </ng-container>
 </section>

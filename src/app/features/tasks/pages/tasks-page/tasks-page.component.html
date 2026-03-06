@@ -9,21 +9,16 @@
       <button type="button" class="btn btn-primary" (click)="openCreate()">
         {{ 'tasks.openCreate' | t }}
       </button>
+
+      <button type="button" class="btn btn-ghost" (click)="toggleLayoutMode()">
+        {{ layoutEditMode ? ('layout.done' | t) : ('layout.edit' | t) }}
+      </button>
+
+      <button type="button" class="btn btn-ghost" (click)="resetLayout()">
+        {{ 'layout.reset' | t }}
+      </button>
     </div>
   </section>
-
-  <app-filters
-    [active]="filter"
-    [search]="search"
-    [selectedDate]="selectedDate"
-    [sort]="sort"
-    (filterChange)="setFilter($event)"
-    (searchChange)="setSearch($event)"
-    (dateChange)="setSelectedDate($event)"
-    (sortChange)="setSort($event)"
-    (exportClick)="exportJson(vm.allTasks)"
-    (importClick)="triggerImport()"
-  />
 
   <input
     #fileInput
@@ -41,21 +36,67 @@
     {{ 'tasks.import.error' | t }}
   </div>
 
-  <div class="content-grid">
-    <app-matrix
-      [items]="vm.items"
-      (editTask)="openEdit($event)"
-      (deleteTask)="requestDelete($event)"
-      (toggleDone)="toggleDone($event, vm.allTasks)"
-    />
+  <ng-container *ngFor="let section of sectionOrder; trackBy: trackBySection">
+    <section class="page-block">
+      <div class="block-toolbar" *ngIf="layoutEditMode">
+        <div class="block-name">
+          {{ layoutLabelKey(section) | t }}
+        </div>
 
-    <app-priority-list
-      [items]="vm.items"
-      (editTask)="openEdit($event)"
-      (deleteTask)="requestDelete($event)"
-      (toggleDone)="toggleDone($event, vm.allTasks)"
-    />
-  </div>
+        <div class="block-toolbar-actions">
+          <button
+            type="button"
+            class="btn btn-xs btn-ghost"
+            (click)="moveSectionUp(section)"
+            [disabled]="!canMoveUp(section)"
+          >
+            {{ 'layout.moveUp' | t }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-xs btn-ghost"
+            (click)="moveSectionDown(section)"
+            [disabled]="!canMoveDown(section)"
+          >
+            {{ 'layout.moveDown' | t }}
+          </button>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="section">
+        <app-filters
+          *ngSwitchCase="'filters'"
+          [active]="filter"
+          [search]="search"
+          [selectedDate]="selectedDate"
+          [sort]="sort"
+          (filterChange)="setFilter($event)"
+          (searchChange)="setSearch($event)"
+          (dateChange)="setSelectedDate($event)"
+          (sortChange)="setSort($event)"
+          (exportClick)="exportJson(vm.allTasks)"
+          (importClick)="triggerImport()"
+        />
+
+        <app-matrix
+          *ngSwitchCase="'matrix'"
+          [items]="vm.items"
+          (editTask)="openEdit($event)"
+          (deleteTask)="requestDelete($event)"
+          (toggleDone)="toggleDone($event, vm.allTasks)"
+        />
+
+        <app-priority-list
+          *ngSwitchCase="'list'"
+          [items]="vm.items"
+          (editTask)="openEdit($event)"
+          (deleteTask)="requestDelete($event)"
+          (toggleDone)="toggleDone($event, vm.allTasks)"
+        />
+      </ng-container>
+    </section>
+  </ng-container>
 
   <button type="button" class="fab btn btn-primary" (click)="openCreate()">
     +

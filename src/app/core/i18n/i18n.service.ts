@@ -158,6 +158,15 @@ const DICT: Record<Lang, Record<string, string>> = {
     'backup.export.filename': 'eisenhower-matrix-backup',
     'backup.versionError': 'Unsupported backup version',
     'backup.invalid': 'Invalid backup file',
+
+    'layout.edit': 'Customize layout',
+    'layout.done': 'Done',
+    'layout.reset': 'Reset layout',
+    'layout.moveUp': 'Move up',
+    'layout.moveDown': 'Move down',
+    'layout.section.filters': 'Filters',
+    'layout.section.matrix': 'Matrix',
+    'layout.section.list': 'Priority list',
   },
 
   ru: {
@@ -296,6 +305,15 @@ const DICT: Record<Lang, Record<string, string>> = {
     'backup.export.filename': 'eisenhower-matrix-backup',
     'backup.versionError': 'Неподдерживаемая версия файла',
     'backup.invalid': 'Некорректный файл резервной копии',
+
+    'layout.edit': 'Настроить блоки',
+    'layout.done': 'Готово',
+    'layout.reset': 'Сбросить порядок',
+    'layout.moveUp': 'Вверх',
+    'layout.moveDown': 'Вниз',
+    'layout.section.filters': 'Фильтры',
+    'layout.section.matrix': 'Матрица',
+    'layout.section.list': 'Список приоритетов',
   },
 };
 

@@ -38,6 +38,8 @@ interface BackupFile {
   tasks: TaskItem[];
 }
 
+type PageSection = 'filters' | 'matrix' | 'list';
+
 @Component({
   selector: 'app-tasks-page',
   standalone: true,
@@ -76,6 +78,11 @@ export class TasksPageComponent {
   private readonly deleteId$ = new BehaviorSubject<string | null>(this.deleteId);
 
   readonly tasks$ = this.repo.tasks$;
+
+  private readonly layoutOrderKey = 'em_tasks_layout_order_v1';
+  readonly defaultSectionOrder: PageSection[] = ['filters', 'matrix', 'list'];
+  sectionOrder: PageSection[] = this.loadSectionOrder();
+  layoutEditMode = false;
 
   readonly vm$ = combineLatest([
     this.tasks$,
@@ -254,6 +261,94 @@ export class TasksPageComponent {
       console.error(e);
       this.flashKey = 'tasks.import.error';
     }
+  }
+
+  toggleLayoutMode(): void {
+    this.layoutEditMode = !this.layoutEditMode;
+  }
+
+  resetLayout(): void {
+    this.sectionOrder = [...this.defaultSectionOrder];
+    this.saveSectionOrder();
+  }
+
+  moveSectionUp(section: PageSection): void {
+    this.moveSection(section, -1);
+  }
+
+  moveSectionDown(section: PageSection): void {
+    this.moveSection(section, 1);
+  }
+
+  canMoveUp(section: PageSection): boolean {
+    return this.sectionOrder.indexOf(section) > 0;
+  }
+
+  canMoveDown(section: PageSection): boolean {
+    const index = this.sectionOrder.indexOf(section);
+    return index > -1 && index < this.sectionOrder.length - 1;
+  }
+
+  trackBySection(_: number, section: PageSection): string {
+    return section;
+  }
+
+  layoutLabelKey(section: PageSection): string {
+    switch (section) {
+      case 'filters':
+        return 'layout.section.filters';
+      case 'matrix':
+        return 'layout.section.matrix';
+      case 'list':
+        return 'layout.section.list';
+    }
+  }
+
+  private moveSection(section: PageSection, delta: -1 | 1): void {
+    const currentIndex = this.sectionOrder.indexOf(section);
+    if (currentIndex < 0) return;
+
+    const nextIndex = currentIndex + delta;
+    if (nextIndex < 0 || nextIndex >= this.sectionOrder.length) return;
+
+    const copy = [...this.sectionOrder];
+    [copy[currentIndex], copy[nextIndex]] = [copy[nextIndex], copy[currentIndex]];
+    this.sectionOrder = copy;
+    this.saveSectionOrder();
+  }
+
+  private loadSectionOrder(): PageSection[] {
+    try {
+      const raw = localStorage.getItem(this.layoutOrderKey);
+      if (!raw) return [...this.defaultSectionOrder];
+
+      const parsed = JSON.parse(raw);
+      if (!this.isValidSectionOrder(parsed)) {
+        return [...this.defaultSectionOrder];
+      }
+
+      return parsed;
+    } catch {
+      return [...this.defaultSectionOrder];
+    }
+  }
+
+  private saveSectionOrder(): void {
+    try {
+      localStorage.setItem(this.layoutOrderKey, JSON.stringify(this.sectionOrder));
+    } catch {}
+  }
+
+  private isValidSectionOrder(value: unknown): value is PageSection[] {
+    if (!Array.isArray(value)) return false;
+
+    const allowed: PageSection[] = ['filters', 'matrix', 'list'];
+    if (value.length !== allowed.length) return false;
+
+    const sortedValue = [...value].sort().join('|');
+    const sortedAllowed = [...allowed].sort().join('|');
+
+    return sortedValue === sortedAllowed;
   }
 
   private extractTasksFromBackup(source: Partial<BackupFile> | TaskItem[]): TaskItem[] {
